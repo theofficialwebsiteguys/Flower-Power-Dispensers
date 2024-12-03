@@ -16,31 +16,31 @@
       <!-- Name Row -->
       <div class="name-row">
         <div class="form-group">
-          <label for="firstName" class="required">First Name</label>
+          <label for="fname" class="required">First Name</label>
           <input
             type="text"
-            id="firstName"
-            formControlName="firstName"
-            [class.invalid]="submitted && registerForm.get('firstName')?.invalid"
+            id="fname"
+            formControlName="fname"
+            [class.invalid]="submitted && registerForm.get('fname')?.invalid"
             placeholder="Enter your first name"
             required
           />
-          <div *ngIf="submitted && registerForm.get('firstName')?.invalid" class="form-error">
+          <div *ngIf="submitted && registerForm.get('fname')?.invalid" class="form-error">
             First name is required and must be at least 2 characters.
           </div>
         </div>
 
         <div class="form-group">
-          <label for="lastName" class="required">Last Name</label>
+          <label for="lname" class="required">Last Name</label>
           <input
             type="text"
-            id="lastName"
-            formControlName="lastName"
-            [class.invalid]="submitted && registerForm.get('lastName')?.invalid"
+            id="lname"
+            formControlName="lname"
+            [class.invalid]="submitted && registerForm.get('lname')?.invalid"
             placeholder="Enter your last name"
             required
           />
-          <div *ngIf="submitted && registerForm.get('lastName')?.invalid" class="form-error">
+          <div *ngIf="submitted && registerForm.get('lname')?.invalid" class="form-error">
             Last name is required and must be at least 2 characters.
           </div>
         </div>
@@ -65,10 +65,10 @@
       <!-- Phone Group -->
       <div class="form-group phone-group">
         <div class="country-code">
-          <label for="countryCode" class="required">Phone</label>
+          <label for="country" class="required">Phone</label>
           <ion-select
-            formControlName="countryCode"
-            id="countryCode"
+            formControlName="country"
+            id="country"
             placeholder="Select Country Code"
             interface="popover"
           >

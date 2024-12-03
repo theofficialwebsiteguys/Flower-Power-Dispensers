@@ -63,6 +63,7 @@ export class AuthService {
       tap((response: {sessionId: string, user: any, expiresAt: Date}) => {
         if (response) {
           // Save the session details or token
+          this.router.navigateByUrl('/rewards');
           this.storeSessionData(response.sessionId, response.expiresAt);
           this.authStatus.next(true); // Notify subscribers of auth status
         }
@@ -92,7 +93,7 @@ export class AuthService {
             // Handle logout logic
             this.removeToken();
             this.authStatus.next(false);
-            this.router.navigate(['/rewards']); // Redirect to rewards page
+            this.router.navigateByUrl('/rewards'); // Redirect to rewards page
             this.userSubject.next(null);
             this.removeUser();
           }
