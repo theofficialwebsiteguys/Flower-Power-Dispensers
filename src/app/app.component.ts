@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 
 import { ProductsService } from './products.service';
 import { AuthService } from './auth.service';
+import { SettingsService } from './settings.service';
 
 @Component({
   selector: 'app-root',
@@ -18,14 +19,18 @@ import { AuthService } from './auth.service';
   ],
 })
 export class AppComponent {
-  showSplashScreen = true;
+  showSplashScreen: boolean = true;
 
-  constructor(private productService: ProductsService, private authService: AuthService) {}
+  constructor(
+    private productService: ProductsService,
+    private authService: AuthService,
+    private settingsService: SettingsService
+  ) {}
 
   ngOnInit() {
     this.productService.fetchProducts();
     this.authService.validateSession();
-
+    this.settingsService.updateTheme();
   }
 
   onCloseSplash() {

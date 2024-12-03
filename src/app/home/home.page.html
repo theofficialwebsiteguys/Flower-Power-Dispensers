@@ -5,13 +5,16 @@
   <app-product-categories></app-product-categories>
   <app-card-slider></app-card-slider>
   <div class="guest-container" *ngIf="!isLoggedIn">
-
     <div class="guest-header">
       <h1>Join Our Rewards Program!</h1>
-      <p>Sign up for free or upgrade to our exclusive Membership for even more perks!</p>
+      <p>
+        Sign up for free or upgrade to our exclusive Membership for even more
+        perks!
+      </p>
     </div>
-  
-    <ion-button expand="block" color="dark" href="/auth?mode=register">Sign Up for Free</ion-button>
-  </div>
 
+    <ion-button expand="block" href="/auth?mode=register"
+      >Sign Up for Free</ion-button
+    >
+  </div>
 </ion-content>

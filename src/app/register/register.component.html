@@ -2,7 +2,13 @@
   <div class="login-container">
     <div class="login-header">
       <div class="login-header-logo">
-        <img src="assets/logo.png" alt="Your Website Guy Logo" class="logo" />
+        <img
+          [src]="
+            darkModeEnabled ? 'assets/logo-dark-mode.png' : 'assets/logo.png'
+          "
+          alt="Your Website Guy Logo"
+          class="logo"
+        />
       </div>
     </div>
 
@@ -10,7 +16,6 @@
     <div *ngIf="error" class="error-message">
       {{ error }}
     </div>
-    
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <!-- Name Row -->
@@ -57,7 +62,10 @@
           placeholder="Enter your email"
           required
         />
-        <div *ngIf="submitted && registerForm.get('email')?.invalid" class="form-error">
+        <div
+          *ngIf="submitted && registerForm.get('email')?.invalid"
+          class="form-error"
+        >
           Valid email is required.
         </div>
       </div>
@@ -72,7 +80,10 @@
             placeholder="Select Country Code"
             interface="popover"
           >
-            <ion-select-option *ngFor="let country of countries" [value]="country.code">
+            <ion-select-option
+              *ngFor="let country of countries"
+              [value]="country.code"
+            >
               {{ country.name }} ({{ country.dialCode }})
             </ion-select-option>
           </ion-select>
@@ -87,7 +98,10 @@
             placeholder="Enter your phone number"
             required
           />
-          <div *ngIf="submitted && registerForm.get('phone')?.invalid" class="form-error">
+          <div
+            *ngIf="submitted && registerForm.get('phone')?.invalid"
+            class="form-error"
+          >
             Phone number is required and must be valid.
           </div>
         </div>
@@ -97,15 +111,72 @@
       <div class="form-group">
         <label for="dob" class="required">Date of Birth</label>
         <div class="dob-container">
-          <input type="text" id="month" formControlName="month" [class.invalid]="submitted && registerForm.get('month')?.invalid" placeholder="MM" class="dob-input" maxlength="2" />
-          <input type="text" id="day" formControlName="day" [class.invalid]="submitted && registerForm.get('day')?.invalid" placeholder="DD" class="dob-input" maxlength="2" />
-          <input type="text" id="year" formControlName="year" [class.invalid]="submitted && registerForm.get('year')?.invalid" placeholder="YYYY" class="dob-input" maxlength="4" />
+          <input
+            type="text"
+            id="month"
+            formControlName="month"
+            [class.invalid]="submitted && registerForm.get('month')?.invalid"
+            placeholder="MM"
+            class="dob-input"
+            maxlength="2"
+          />
+          <input
+            type="text"
+            id="day"
+            formControlName="day"
+            [class.invalid]="submitted && registerForm.get('day')?.invalid"
+            placeholder="DD"
+            class="dob-input"
+            maxlength="2"
+          />
+          <input
+            type="text"
+            id="year"
+            formControlName="year"
+            [class.invalid]="submitted && registerForm.get('year')?.invalid"
+            placeholder="YYYY"
+            class="dob-input"
+            maxlength="4"
+          />
         </div>
-        <div *ngIf="submitted && dobEmptyError || dobInvalidError" class="form-error">
+        <div
+          *ngIf="(submitted && dobEmptyError) || dobInvalidError"
+          class="form-error"
+        >
           A valid Date of Birth is Required.
         </div>
         <div *ngIf="submitted && underageError" class="form-error">
           You must be 21 years or older.
+          <input
+            type="text"
+            id="month"
+            formControlName="month"
+            placeholder="MM"
+            class="dob-input"
+            maxlength="2"
+          />
+          <input
+            type="text"
+            id="day"
+            formControlName="day"
+            placeholder="DD"
+            class="dob-input"
+            maxlength="2"
+          />
+          <input
+            type="text"
+            id="year"
+            formControlName="year"
+            placeholder="YYYY"
+            class="dob-input"
+            maxlength="4"
+          />
+        </div>
+        <div
+          *ngIf="submitted && registerForm.get('dob')?.invalid"
+          class="form-error"
+        >
+          Date of Birth is required and you must be 18+ years old.
         </div>
       </div>
 
@@ -120,7 +191,10 @@
           placeholder="Enter your password"
           required
         />
-        <div *ngIf="submitted && registerForm.get('password')?.invalid" class="form-error">
+        <div
+          *ngIf="submitted && registerForm.get('password')?.invalid"
+          class="form-error"
+        >
           Password is required and must be at least 6 characters.
         </div>
       </div>
@@ -132,25 +206,29 @@
           type="password"
           id="confirmPassword"
           formControlName="confirmPassword"
-          [class.invalid]="submitted && registerForm.get('notMatching')?.invalid"
+          [class.invalid]="
+            submitted && registerForm.get('notMatching')?.invalid
+          "
           placeholder="Confirm your password"
           required
         />
-        <div *ngIf="submitted && registerForm.hasError('notMatching')" class="form-error">
+        <div
+          *ngIf="submitted && registerForm.hasError('notMatching')"
+          class="form-error"
+        >
           Passwords do not match.
         </div>
       </div>
 
       <!-- Submit Button -->
       <ion-button
-      expand="block"
-      color="dark"
-      type="submit"
-      [disabled]="!isFormTouched || loading"
-        >
-      <ion-spinner *ngIf="loading" slot="start"></ion-spinner>
-      Register
-    </ion-button>
+        expand="block"
+        type="submit"
+        [disabled]="!isFormTouched || loading"
+      >
+        <ion-spinner *ngIf="loading" slot="start"></ion-spinner>
+        Register
+      </ion-button>
     </form>
 
     <p class="login-link">

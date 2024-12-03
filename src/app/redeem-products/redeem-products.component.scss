@@ -1,74 +1,73 @@
 .slider-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 0 auto;
-    width: 100%;
-    padding: 10px 0;
-    box-sizing: border-box;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .slider {
-    display: flex;
-    gap: 10px;
-    width: max-content;
-  }
-  
-  .slide {
-    flex: 0 0 auto;
-    width: 180px;
-  }
-  
-  .card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .image-container {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    overflow: hidden;
-    border-bottom: 2px solid #f0f0f0;
-  }
-  
-  .image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .points-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 123, 255, 0.9);
-    color: #fff;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
-  
-  .card-content {
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .card-content h3 {
-    font-size: 1rem;
-    margin: 0;
-    color: #333;
-  }
-  
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 auto;
+  width: 100%;
+  padding: 10px 0;
+  box-sizing: border-box;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.slider {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+}
+
+.slide {
+  flex: 0 0 auto;
+  width: 180px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.points-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--ion-color-primary);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.card-content {
+  padding: 10px;
+  text-align: center;
+}
+
+.card-content h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: #333;
+}

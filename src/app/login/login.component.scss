@@ -3,7 +3,6 @@ $primary-bg: #ffffff;
 $secondary-bg: #f7f8fa;
 $text-color-dark: #333;
 $text-color-light: #666;
-$accent-color: #4caf50; // A vibrant green for call-to-action buttons
 $disabled-btn-bg: #e0e0e0;
 $btn-text-color: #ffffff;
 $input-border-color: #dcdcdc;
@@ -72,6 +71,12 @@ $spacing: 16px;
     margin-bottom: 6px;
     font-weight: 600;
     color: $text-color-dark;
+
+    &.required::after {
+      content: "*";
+      color: var(--ion-color-danger);
+      margin-left: 2px;
+    }
   }
 
   input[type="email"],
@@ -85,32 +90,9 @@ $spacing: 16px;
     color: $text-color-dark;
 
     &:focus {
-      border-color: $accent-color;
+      border-color: var(--ion-color-primary);
       outline: none;
     }
-  }
-}
-
-// Submit Button
-button[type="submit"] {
-  width: 100%;
-  padding: 14px;
-  background-color: $accent-color;
-  color: $btn-text-color;
-  border: none;
-  border-radius: $border-radius;
-  font-size: $font-size-btn;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: darken($accent-color, 10%);
-  }
-
-  &:disabled {
-    background-color: $disabled-btn-bg;
-    cursor: not-allowed;
   }
 }
 
@@ -120,12 +102,12 @@ button[type="submit"] {
   margin-top: $spacing;
 
   a {
-    color: $accent-color;
+    color: var(--ion-color-primary-tint);
     text-decoration: underline;
     font-size: $font-size-footer-link;
 
     &:hover {
-      color: darken($accent-color, 10%);
+      color: var(--ion-color-primary);
     }
   }
 }
@@ -144,24 +126,24 @@ button[type="submit"] {
 
 // Forgot Password Section
 .forgot-password {
-    text-align: right; // Align the link to the right
-    margin-bottom: $spacing;
-  
-    a {
-      color: $accent-color;
-      text-decoration: none;
-      font-size: $font-size-footer-link;
-      font-weight: 500;
-  
-      &:hover {
-        text-decoration: underline;
-        color: darken($accent-color, 10%);
-      }
+  text-align: right; // Align the link to the right
+  margin-bottom: $spacing;
+
+  a {
+    color: var(--ion-color-primary-tint);
+    text-decoration: none;
+    font-size: $font-size-footer-link;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+      color: var(--ion-color-primary);
     }
   }
-  
+}
+
 .form-error {
-  color: #d32f2f;
+  color: var(--ion-color-danger);
   font-size: 0.8rem;
   margin-top: 0.4rem;
   display: block;
@@ -169,10 +151,10 @@ button[type="submit"] {
   padding-left: 0.2rem;
 }
 
-  /* Error Message */
+/* Error Message */
 .error-message {
-  color: #d32f2f;
-  background: #fdecea;
+  color: var(--ion-color-danger);
+  background: rgba(var(--ion-color-danger-rgb), 0.12);
   padding: 0.8rem;
   border-radius: 8px;
   margin-bottom: 1rem;

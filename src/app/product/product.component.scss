@@ -1,6 +1,7 @@
 ion-item {
   --padding-start: 24px;
   --padding-end: 24px;
+  --border-color: rgba(var(--ion-color-dark-rgb), 0.15);
 }
 
 .container {
@@ -15,11 +16,11 @@ ion-item {
 }
 
 img {
-  height: 100%;
-  width: 30%;
+  width: 100px;
 }
 
 .info {
+  width: 100%;
 }
 
 .weightAndPrice {

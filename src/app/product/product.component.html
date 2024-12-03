@@ -1,6 +1,6 @@
 <ion-item (click)="updateProductDisplay()">
   <ion-row class="container">
-    <img [src]="product.image"/>
+    <img [src]="product.image" />
     <ion-label class="info">
       <p>{{ product.brand }}</p>
       <h1>{{ product.title }}</h1>
@@ -8,7 +8,7 @@
       <p>{{ product.thc }}</p>
       <ion-row class="weightAndPrice">
         <h3>{{ product.weight }}</h3>
-        <h2>${{ product.price }}</h2>
+        <h2>{{ product.price | currency }}</h2>
       </ion-row>
     </ion-label>
   </ion-row>

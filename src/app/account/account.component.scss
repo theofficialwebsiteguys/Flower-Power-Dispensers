@@ -13,14 +13,13 @@
     h1 {
       font-size: 1.8rem;
       font-weight: bold;
-      color: #2a2a2a;
+      color: var(--ion-color-dark);
     }
   }
 
   /* Card Style */
   .card {
     width: 100%;
-    max-width: 400px;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -41,7 +40,7 @@
 
       ion-icon {
         font-size: 1.6rem;
-        color: #4caf50;
+        color: var(--ion-color-primary);
         margin-right: 15px;
       }
 
@@ -86,7 +85,7 @@
       }
 
       ion-toggle {
-        --handle-background: #4caf50;
+        --handle-background: var(--ion-color-primary);
         --background-checked: rgba(76, 175, 80, 0.2);
         --background: #ddd;
       }

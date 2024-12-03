@@ -18,20 +18,16 @@ export class CardSliderComponent {
       category: 'FLOWER',
     },
     {
-      title: 'Pre-Roll',
+      title: 'Pre-Rolls',
       category: 'PRE_ROLLS',
     },
     {
-      title: 'Edible',
+      title: 'Edibles',
       category: 'EDIBLES',
     },
     {
       title: 'Vaporizers',
       category: 'VAPORIZERS',
-    },
-    {
-      title: 'Edible',
-      category: 'EDIBLES',
     },
     {
       title: 'Accessories',
@@ -48,7 +44,7 @@ export class CardSliderComponent {
   ngOnInit() {
     this.productService.getProducts().subscribe((products) => {
       this.products = products;
-      console.log(this.products)
+      console.log(this.products);
     });
   }
 

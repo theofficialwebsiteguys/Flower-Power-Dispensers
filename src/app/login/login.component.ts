@@ -1,27 +1,37 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { AuthService } from '../auth.service';
+import { SettingsService } from '../settings.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent  {
+export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
   submitted = false;
   error = ''; // Error message to display
+  darkModeEnabled: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private settingsService: SettingsService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
+    });
+  }
+
+  ngOnInit() {
+    this.settingsService.isDarkModeEnabled$.subscribe((isDarkModeEnabled) => {
+      this.darkModeEnabled = isDarkModeEnabled;
     });
   }
 
@@ -66,5 +76,4 @@ export class LoginComponent  {
     }
     return 'An unexpected error occurred. Please try again.';
   }
-  
 }

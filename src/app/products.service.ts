@@ -3,6 +3,7 @@ import { Product } from './product/product.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 import { ProductCategory } from './product-category/product-category.model';
 import {
@@ -52,18 +53,20 @@ export class ProductsService {
       return;
     }
 
-    this.http.get<Product[]>('https://dispensary-api-ac9613fa4c11.herokuapp.com/api/products/all-products').subscribe(
-      (products) => {
-        this.products.next(products); // Update BehaviorSubject
-        this.saveProductsToLocalStorage(products); // Save to local storage
-        console.log(products); // Verify all products are fetched
-      },
-      (error) => {
-        console.error('Error fetching products from backend:', error);
-      }
-    );
+    this.http
+      .get<Product[]>(`${environment.apiUrl}/products/all-products`)
+      .subscribe(
+        (products) => {
+          this.products.next(products); // Update BehaviorSubject
+          this.saveProductsToLocalStorage(products); // Save to local storage
+          console.log(products); // Verify all products are fetched
+        },
+        (error) => {
+          console.error('Error fetching products from backend:', error);
+        }
+      );
   }
-  
+
   getProducts(): Observable<Product[]> {
     return this.products$;
   }
@@ -96,9 +99,13 @@ export class ProductsService {
             return (
               category === this.currentCategory.value &&
               (isEmpty(brands) || brands.includes(brand)) &&
-              (isEmpty(strains) || strains.includes(strainType)) &&
-              (isEmpty(weights) || weights.includes(weight)) &&
-              isInRange(Number(thc), thcRange)
+              (!strainType ||
+                isEmpty(strains) ||
+                strains.some((s) =>
+                  strainType.toUpperCase().split(' ').includes(s)
+                )) &&
+              (!weight || isEmpty(weights) || weights.includes(weight)) &&
+              (!thc || isInRange(Number(thc.split('%')[0]), thcRange))
             );
           })
           .sort(

@@ -3,10 +3,9 @@
     class="carousel-slide"
     *ngFor="let banner of banners; let i = index"
     [class.active]="i === currentIndex"
-    [style.backgroundImage]="'url(' + banner.image + ')'"
   >
     <div class="banner-content">
-
+      <img [src]="banner.image" alt="" />
     </div>
   </div>
 </div>

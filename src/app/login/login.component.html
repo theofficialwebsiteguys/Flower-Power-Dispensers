@@ -2,7 +2,13 @@
   <div class="login-container">
     <div class="login-header">
       <div class="login-header-logo">
-        <img src="assets/logo.png" alt="Your Website Guy Logo" class="logo" />
+        <img
+          [src]="
+            darkModeEnabled ? 'assets/logo-dark-mode.png' : 'assets/logo.png'
+          "
+          alt="Your Website Guy Logo"
+          class="logo"
+        />
       </div>
     </div>
 
@@ -15,7 +21,7 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <!-- Email -->
       <div class="form-group">
-        <label for="email">Email*</label>
+        <label for="email" class="required">Email</label>
         <input
           type="email"
           id="email"
@@ -23,14 +29,17 @@
           placeholder="Enter your email"
           required
         />
-        <div *ngIf="submitted && loginForm.get('email')?.invalid" class="form-error">
+        <div
+          *ngIf="submitted && loginForm.get('email')?.invalid"
+          class="form-error"
+        >
           Valid email is required.
         </div>
       </div>
 
       <!-- Password -->
       <div class="form-group">
-        <label for="password">Password*</label>
+        <label for="password" class="required">Password</label>
         <input
           type="password"
           id="password"
@@ -38,7 +47,10 @@
           placeholder="Enter your password"
           required
         />
-        <div *ngIf="submitted && loginForm.get('password')?.invalid" class="form-error">
+        <div
+          *ngIf="submitted && loginForm.get('password')?.invalid"
+          class="form-error"
+        >
           Password is required.
         </div>
       </div>
@@ -51,7 +63,6 @@
       <!-- Submit Button -->
       <ion-button
         expand="block"
-        color="dark"
         type="submit"
         [disabled]="loginForm.invalid || loading"
       >

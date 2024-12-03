@@ -1,5 +1,8 @@
 <div class="button-container">
-  <ion-button (click)="setOpen(true)" color="dark">Sort + Filter</ion-button>
+  <ion-button (click)="setOpen(true)">Sort + Filter</ion-button>
+  <ion-button (click)="clearFilters()" *ngIf="hasDirtyFilters" fill="clear">
+    Clear Filters
+  </ion-button>
 </div>
 
 <ion-modal [isOpen]="isModalOpen" (ionModalDidDismiss)="setOpen(false)">
@@ -7,10 +10,11 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>Sort + Filter</ion-title>
-        <ion-buttons slot="end"
-          ><ion-button (click)="setOpen(false)">
-            <ion-icon slot="icon-only" name="close"></ion-icon> </ion-button
-        ></ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button (click)="setOpen(false)">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -122,7 +126,6 @@
             [pin]="true"
             [value]="filters.potency.thc"
             [(ngModel)]="filters.potency.thc"
-            color="dark"
             (ionChange)="handleFilterUpdate()"
           ></ion-range>
         </ion-row>

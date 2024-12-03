@@ -1,24 +1,24 @@
 import { Component, Input, OnInit } from '@angular/core';
+
 import { AuthService } from '../auth.service';
+import { SettingsService } from '../settings.service';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
 })
-export class AccountComponent {
+export class AccountComponent implements OnInit {
   @Input() user: any;
 
   allowNotifications: boolean = false; // Tracks the current notification setting
+  darkModeEnabled: boolean = false;
   userId: string = ''; // Store the current user's ID
 
-  settings = {
-    notifications: true,
-    darkMode: false,
-  };
-
-  constructor(private authService: AuthService){
-  }
+  constructor(
+    private authService: AuthService,
+    private settingsService: SettingsService
+  ) {}
 
   ngOnInit(): void {
     // Retrieve the user and their notification settings on component load
@@ -37,29 +37,24 @@ export class AccountComponent {
         }
       });
     }
+
+    this.darkModeEnabled = this.settingsService.getDarkModeEnabled();
   }
 
   onToggleNotifications(event: any): void {
-    const newValue = event.detail.checked; // Get the new value of the toggle
-    this.allowNotifications = newValue;
-
-    // Call the service to toggle notifications
-    this.authService
-      .toggleUserNotifications(this.userId)
-      .subscribe({
-        next: () => {
-          console.log('Notification setting updated successfully');
-        },
-        error: (err) => {
-          console.error('Failed to update notification setting:', err);
-          // Revert the toggle if there was an error
-          this.allowNotifications = !newValue;
-        },
-      });
+    this.authService.toggleUserNotifications(this.userId).subscribe({
+      next: () => {
+        console.log('Notification setting updated successfully');
+        this.allowNotifications = event.detail.checked;
+      },
+      error: (err) => {
+        console.error('Failed to update notification setting:', err);
+      },
+    });
   }
 
-  onToggleDarkMode(event: any){
-
+  onToggleDarkMode(event: any) {
+    this.darkModeEnabled = event.detail.checked;
+    this.settingsService.setDarkModeEnabled(this.darkModeEnabled);
   }
-
 }

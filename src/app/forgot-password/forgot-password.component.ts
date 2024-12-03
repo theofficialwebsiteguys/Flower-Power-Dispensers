@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { AuthService } from '../auth.service';
+import { SettingsService } from '../settings.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,10 +14,21 @@ export class ForgotPasswordComponent {
   forgotPasswordForm: FormGroup;
   emailSent = false; // Flag to toggle between form and success message
   errorMessage = ''; // Store error message to display
+  darkModeEnabled: boolean = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private settingsService: SettingsService
+  ) {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
+    });
+  }
+
+  ngOnInit() {
+    this.settingsService.isDarkModeEnabled$.subscribe((isDarkModeEnabled) => {
+      this.darkModeEnabled = isDarkModeEnabled;
     });
   }
 
@@ -50,5 +63,4 @@ export class ForgotPasswordComponent {
     }
     return 'An unexpected error occurred. Please try again.';
   }
-
 }

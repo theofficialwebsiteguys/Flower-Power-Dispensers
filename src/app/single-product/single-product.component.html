@@ -3,19 +3,30 @@
     <ion-icon name="arrow-back-outline"></ion-icon>
   </div>
   <div class="image-container">
-    <img [src]="currentProduct.image || 'assets/default.jpg'" alt="Product Image" />
+    <img
+      [src]="currentProduct.image || 'assets/default.jpg'"
+      alt="Product Image"
+    />
   </div>
   <div class="product-info">
     <p class="brand">{{ currentProduct.brand }}</p>
     <h2 class="title">{{ currentProduct.title }}</h2>
     <span class="price">{{ currentProduct.price | currency }}</span>
-    <p class="strain">{{ currentProduct.strainType }} {{ currentProduct.thc ? '- ' + currentProduct.thc : '' }}</p>
+    <p class="strain">
+      {{ currentProduct.strainType }}
+      {{ currentProduct.strainType && currentProduct.thc ? "-" : "" }}
+      {{ currentProduct.thc }}
+    </p>
     <p class="description">
       {{ getDescription() }}
-      <span class="see-more" (click)="toggleDescription()" *ngIf="currentProduct.desc">
-        {{ showFullDescription ? 'See Less' : 'See More' }}
+      <span
+        class="see-more"
+        (click)="toggleDescription()"
+        *ngIf="currentProduct.desc"
+      >
+        {{ showFullDescription ? "See Less" : "See More" }}
       </span>
     </p>
-    <span class="weight">{{ currentProduct.weight }} g</span>
+    <span class="weight">{{ currentProduct.weight }}</span>
   </div>
 </div>

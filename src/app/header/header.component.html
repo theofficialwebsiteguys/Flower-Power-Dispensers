@@ -2,7 +2,12 @@
   <!-- Left Button -->
   <ion-buttons slot="start">
     <ion-button class="action-button" href="/home"
-      ><img src="assets/logo.png" class="logo" alt="logo"
+      ><img
+        [src]="
+          darkModeEnabled ? 'assets/logo-dark-mode.png' : 'assets/logo.png'
+        "
+        class="logo"
+        alt="logo"
     /></ion-button>
   </ion-buttons>
 
@@ -18,11 +23,7 @@
     </ion-button>
 
     <!-- Log Out Button (Visible when logged in) -->
-    <ion-button
-      class="action-button"
-      *ngIf="isLoggedIn"
-      (click)="logout()"
-    >
+    <ion-button class="action-button" *ngIf="isLoggedIn" (click)="logout()">
       Log Out
     </ion-button>
   </ion-buttons>

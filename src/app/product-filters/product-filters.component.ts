@@ -31,7 +31,8 @@ export class ProductFiltersComponent implements OnInit {
 
   isModalOpen = false;
 
-  filters: ProductFilters = DEFAULT_PRODUCT_FILTERS;
+  filters: ProductFilters = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_FILTERS));
+  hasDirtyFilters: boolean = false;
 
   criteriaOptions: CriteriaOptions = OPTIONS_CRITERIA;
   directionOptions: DirectionOptions = OPTIONS_DIRECTIONS;
@@ -54,7 +55,14 @@ export class ProductFiltersComponent implements OnInit {
   }
 
   handleFilterUpdate() {
+    this.hasDirtyFilters =
+      JSON.stringify(this.filters) !== JSON.stringify(DEFAULT_PRODUCT_FILTERS);
     this.productService.updateProductFilters(this.filters);
+  }
+
+  clearFilters(): void {
+    this.filters = JSON.parse(JSON.stringify(DEFAULT_PRODUCT_FILTERS));
+    this.handleFilterUpdate();
   }
 
   isChecked(array: any, value: string): boolean {

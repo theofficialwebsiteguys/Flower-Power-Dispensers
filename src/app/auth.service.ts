@@ -1,13 +1,21 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  map,
+  Observable,
+  of,
+  tap,
+  throwError,
+} from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private userSubject = new BehaviorSubject<any>(null); // Store user info
 
   private authStatus = new BehaviorSubject<boolean>(this.hasToken()); // Observable for auth status
@@ -19,12 +27,9 @@ export class AuthService {
     }
   }
 
-  // API URLs (replace with your API endpoints)
-  //private apiUrl = 'http://localhost:3333/api/users'; 
-  private apiUrl = 'https://dispensary-api-ac9613fa4c11.herokuapp.com/api/users'; 
+  private apiUrl = `${environment.apiUrl}/users`;
 
-
-   // Observable for user info
+  // Observable for user info
   getUserInfo(): any {
     return this.userSubject.asObservable();
   }
@@ -45,11 +50,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, payload).pipe(
       tap(() => {
         // Automatically login the user after registration
-        this.login({ email: userData.email, password: userData.password }).subscribe();
+        this.login({
+          email: userData.email,
+          password: userData.password,
+        }).subscribe();
       })
     );
   }
-  
+
   // Log in a user
   login(credentials: { email: string; password: string }): Observable<any> {
     // Add business info to the payload
@@ -73,14 +81,13 @@ export class AuthService {
       })
     );
   }
-  
+
   logout(): void {
     const sessionData = localStorage.getItem('sessionData');
     const headers = new HttpHeaders({
       Authorization: sessionData ? JSON.parse(sessionData).token : null, // Set Authorization header
     });
 
-  
     this.http
       .post<{ sessionId: string; user: any; expiresAt: Date }>(
         `${this.apiUrl}/logout`,
@@ -125,40 +132,42 @@ export class AuthService {
     localStorage.removeItem('sessionData');
   }
 
-  
   // Remove the token
   private removeUser(): void {
     localStorage.removeItem('user_info');
   }
-
 
   // Check if token exists
   private hasToken(): boolean {
     return !!this.getSessionData();
   }
 
-
   isTokenExpired(expiry: Date): boolean {
     const currentTime = new Date().getTime(); // Get the current time in milliseconds
     const expiryTime = new Date(expiry).getTime(); // Convert the expiry date to milliseconds
-  
+
     // Return true if the current time is greater than or equal to the expiry time
     return currentTime >= expiryTime;
   }
-  
+
   sendPasswordReset(email: string): Observable<void> {
     const business_id = 1;
-    return this.http.post<void>(`${this.apiUrl}/forgot-password`, { email, business_id });
+    return this.http.post<void>(`${this.apiUrl}/forgot-password`, {
+      email,
+      business_id,
+    });
   }
 
   resetPassword(password: string, token: string | null): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/reset-password`, { password, token });
+    return this.http.post<void>(`${this.apiUrl}/reset-password`, {
+      password,
+      token,
+    });
   }
-
 
   validateSession(): void {
     const sessionData = this.getSessionData();
-  
+
     if (!sessionData || this.isTokenExpired(sessionData.expiry)) {
       // No session or expired session
       this.authStatus.next(false); // Notify subscribers that the user is logged out
@@ -166,28 +175,28 @@ export class AuthService {
       this.removeUser();
       return;
     }
-  
 
     // If token exists, validate it against the backend
     const headers = new HttpHeaders({
       Authorization: sessionData?.token, // Use the stored token
     });
-  
-    console.log(sessionData)
+
+    console.log(sessionData);
     this.http
-    .get<{ valid: boolean }>(`${this.apiUrl}/validate-session`, { headers })
-    .pipe(
-      map((response) => response.valid), // Transform the response to just the boolean
-      tap((isValid) => {
-        if (isValid) {
-          this.authStatus.next(true); // Session is valid
-        } else {
-          this.authStatus.next(false); // Session is invalid
-          this.removeToken(); // Clear invalid session data
-          this.removeUser();
-        }
-      })
-    ).subscribe();
+      .get<{ valid: boolean }>(`${this.apiUrl}/validate-session`, { headers })
+      .pipe(
+        map((response) => response.valid), // Transform the response to just the boolean
+        tap((isValid) => {
+          if (isValid) {
+            this.authStatus.next(true); // Session is valid
+          } else {
+            this.authStatus.next(false); // Session is invalid
+            this.removeToken(); // Clear invalid session data
+            this.removeUser();
+          }
+        })
+      )
+      .subscribe();
   }
 
   toggleUserNotifications(userId: string): Observable<any> {
@@ -206,24 +215,27 @@ export class AuthService {
     const payload = { userId }; // Pass the userId in the request body
 
     return this.http
-    .put(`${this.apiUrl}/toggle-notifications`, payload, { headers })
-    .pipe(
-      tap((response: any) => {
-        // Call another function here
-        this.storeUserInfo(response.user);
-      }),
-      catchError((error) => {
-        console.error('Error toggling notifications:', error);
-        return throwError(() => error);
-      })
-    );
+      .put(`${this.apiUrl}/toggle-notifications`, payload, { headers })
+      .pipe(
+        tap((response: any) => {
+          // Call another function here
+          this.storeUserInfo(response.user);
+        }),
+        catchError((error) => {
+          console.error('Error toggling notifications:', error);
+          return throwError(() => error);
+        })
+      );
   }
-  
+
   validateResetToken(token: string) {
     return this.http
-      .get<{ valid: boolean; user?: any }>(`${this.apiUrl}/validate-reset-token`, {
-        params: { token }, // Pass token as a query parameter
-      })
+      .get<{ valid: boolean; user?: any }>(
+        `${this.apiUrl}/validate-reset-token`,
+        {
+          params: { token }, // Pass token as a query parameter
+        }
+      )
       .pipe(
         tap((response) => {
           if (response.valid && response.user) {
@@ -236,5 +248,4 @@ export class AuthService {
         })
       );
   }
-  
 }
