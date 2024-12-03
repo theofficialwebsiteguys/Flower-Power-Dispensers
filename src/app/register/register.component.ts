@@ -137,7 +137,7 @@ export class RegisterComponent {
       fname: formData.firstName,
       lname: formData.lastName,
       email: formData.email,
-      dob: formData.dob,
+      dob: dob,
       country: formData.countryCode,
       phone: formData.phone,
       password: formData.password,
