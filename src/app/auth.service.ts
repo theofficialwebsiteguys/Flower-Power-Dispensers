@@ -66,24 +66,20 @@ export class AuthService {
       businessId: '1', // Replace with your business ID logic
       businessName: 'Flower Power Dispensers', // Replace with your business name logic
     };
-
-    return this.http
-      .post<{ sessionId: string; user: any; expiresAt: Date }>(
-        `${this.apiUrl}/login`,
-        payload
-      )
-      .pipe(
-        tap((response: { sessionId: string; user: any; expiresAt: Date }) => {
-          if (response) {
-            // Save the session details or token
-            this.storeSessionData(response.sessionId, response.expiresAt);
-            this.authStatus.next(true); // Notify subscribers of auth status
-          }
-          if (response.user) {
-            this.storeUserInfo(response.user); // Save user information locally
-          }
-        })
-      );
+  
+    return this.http.post<{sessionId: string, user: any, expiresAt: Date}>(`${this.apiUrl}/login`, payload).pipe(
+      tap((response: {sessionId: string, user: any, expiresAt: Date}) => {
+        if (response) {
+          // Save the session details or token
+          this.router.navigateByUrl('/rewards');
+          this.storeSessionData(response.sessionId, response.expiresAt);
+          this.authStatus.next(true); // Notify subscribers of auth status
+        }
+        if (response.user) {
+          this.storeUserInfo(response.user); // Save user information locally
+        }
+      })
+    );
   }
 
   logout(): void {
@@ -104,7 +100,7 @@ export class AuthService {
             // Handle logout logic
             this.removeToken();
             this.authStatus.next(false);
-            this.router.navigate(['/rewards']); // Redirect to rewards page
+            this.router.navigateByUrl('/rewards'); // Redirect to rewards page
             this.userSubject.next(null);
             this.removeUser();
           }

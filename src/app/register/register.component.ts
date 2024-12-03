@@ -53,44 +53,20 @@ export class RegisterComponent {
     private authService: AuthService,
     private settingsService: SettingsService
   ) {
-    this.registerForm = this.fb.group(
-      {
-        firstName: ['', [Validators.required, Validators.minLength(2)]],
-        lastName: ['', [Validators.required, Validators.minLength(2)]],
-        email: ['', [Validators.required, Validators.email]],
-        countryCode: [this.countries[0].code, Validators.required], // Default to the first country
-        phone: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]], // 7-15 digits
-        month: [
-          '',
-          [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])$/)],
-        ], // MM
-        day: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(/^(0[1-9]|[12][0-9]|3[01])$/),
-          ],
-        ], // DD
-        year: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(
-              new RegExp(
-                `^(19[0-9][0-9]|20[0-${this.currentYear % 10}][0-${Math.floor(
-                  (this.currentYear % 100) / 10
-                )}])$`
-              )
-            ),
-          ],
-        ], // YYYY
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]],
-      },
-      {
-        validator: this.passwordMatchValidator, // Custom validator
-      }
-    );
+    this.registerForm = this.fb.group({
+      fname: ['', [Validators.required, Validators.minLength(2)]],
+      lname: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      country: [this.countries[0].code, Validators.required], // Default to the first country
+      phone: ['', [Validators.required, Validators.pattern(/^\d{7,15}$/)]], // 7-15 digits
+      month: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])$/)]], // MM
+      day: ['', [Validators.required, Validators.pattern(/^(0[1-9]|[12][0-9]|3[01])$/)]], // DD
+      year: ['', [Validators.required, Validators.pattern(new RegExp(`^(19[0-9][0-9]|20[0-${this.currentYear % 10}][0-${Math.floor((this.currentYear % 100) / 10)}])$`))]], // YYYY
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],     
+    }, {
+      validator: this.passwordMatchValidator, // Custom validator
+    });
   }
 
   ngOnInit() {
@@ -106,7 +82,6 @@ export class RegisterComponent {
   onSubmit() {
     this.submitted = true;
 
-    console.log('here');
     if (this.registerForm.invalid) {
       console.log(this.registerForm);
       this.dobInvalidError = true;
@@ -158,19 +133,8 @@ export class RegisterComponent {
 
     this.loading = true;
     this.error = ''; // Clear previous error
-
-    const formData = this.registerForm.value;
-    const userData = {
-      fname: formData.firstName,
-      lname: formData.lastName,
-      email: formData.email,
-      dob: formData.dob,
-      country: formData.countryCode,
-      phone: formData.phone,
-      password: formData.password,
-    };
-
-    this.authService.register(userData).subscribe({
+  
+    this.authService.register({...this.registerForm.value, dob}).subscribe({
       next: () => {
         this.loading = false;
       },
@@ -182,10 +146,10 @@ export class RegisterComponent {
   }
 
   onCountryCodeChange() {
-    const countryCode = this.registerForm.get('countryCode')?.value;
+    const country = this.registerForm.get('country')?.value;
     const phoneControl = this.registerForm.get('phone');
     if (phoneControl) {
-      phoneControl.setValue(`${countryCode}${phoneControl.value || ''}`);
+      phoneControl.setValue(`${country}${phoneControl.value || ''}`);
     }
   }
 
