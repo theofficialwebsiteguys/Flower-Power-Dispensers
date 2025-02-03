@@ -3,6 +3,7 @@ import { CartItem, CartService } from '../cart.service';
 import { IonContent, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 import { AccessibilityService } from '../accessibility.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -22,12 +23,15 @@ export class CartPage {
 
   isLoading: boolean = false;
 
+  isRefreshing = false; 
+
   constructor(
     private readonly cartService: CartService,
     private toastController: ToastController,
     private loadingController: LoadingController,
     private authService: AuthService,
-    private accessibilityService: AccessibilityService
+    private accessibilityService: AccessibilityService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -96,5 +100,20 @@ export class CartPage {
     this.cartItems = [];
     this.checkoutInfo = null;
     this.accessibilityService.announce('Your cart has been cleared.', 'polite');
+  }
+
+
+  refreshPage(event: any) {
+    console.log('Refreshing Cart Page...');
+    this.isRefreshing = true; // Show loading animation
+
+    setTimeout(() => {
+      this.router.navigateByUrl('/cart', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/cart']);
+      });
+
+      this.isRefreshing = false; // Hide loading animation
+      event.target.complete(); // Stop refresher animation
+    }, 1000); // Adjust delay for better UX
   }
 }
