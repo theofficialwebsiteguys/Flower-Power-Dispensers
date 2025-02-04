@@ -1,40 +1,27 @@
 <ion-content>
-
   <app-header></app-header>
 
-  <ion-refresher slot="fixed" (ionRefresh)="refreshPage($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  <div *ngIf="!showCheckout && !showConfirmation">
+    <ng-container *ngIf="cartItems.length > 0; else emptyCart">
+      <app-cart-items [items]="cartItems"></app-cart-items>
+      <div class="checkout-container">
+        <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">Continue</ion-button>
+      </div>
+    </ng-container>
 
-  <div class="loading-overlay" *ngIf="isRefreshing">
-    <ion-spinner name="crescent"></ion-spinner>
+    <ng-template #emptyCart>
+      <div class="empty-cart-message" role="alert" aria-live="polite">
+        <ion-icon name="cart-outline" size="large" aria-hidden="true"></ion-icon>
+        <p>Your cart is empty!</p>
+        <ion-button routerLink="/products" aria-label="Browse available products">Browse Products</ion-button>
+      </div>
+    </ng-template>
+
+    <app-recent-orders></app-recent-orders>
   </div>
 
-  <ng-container *ngIf="!isRefreshing">
-    <div *ngIf="!showCheckout && !showConfirmation">
-      <ng-container *ngIf="cartItems.length > 0; else emptyCart">
-        <app-cart-items [items]="cartItems"></app-cart-items>
-        <div class="checkout-container">
-          <ion-button class="checkout-button" (click)="checkout()" aria-label="Proceed to checkout">
-            Continue
-          </ion-button>
-        </div>
-      </ng-container>
-
-      <ng-template #emptyCart>
-        <div class="empty-cart-message" role="alert" aria-live="polite">
-          <ion-icon name="cart-outline" size="large" aria-hidden="true"></ion-icon>
-          <p>Your cart is empty!</p>
-          <ion-button routerLink="/products" aria-label="Browse available products">Browse Products</ion-button>
-        </div>
-      </ng-template>
-
-      <app-recent-orders></app-recent-orders>
-    </div>
-
-    <div *ngIf="showCheckout">
-      <app-checkout [checkoutInfo]="checkoutInfo" (back)="removeCheckout()" (orderPlaced)="onOrderPlaced()" aria-label="Checkout section"></app-checkout>
-    </div>
-  </ng-container>
+  <div *ngIf="showCheckout">
+    <app-checkout [checkoutInfo]="checkoutInfo" (back)="removeCheckout()" (orderPlaced)="onOrderPlaced()" aria-label="Checkout section"></app-checkout>
+  </div>
 
 </ion-content>

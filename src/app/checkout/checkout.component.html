@@ -119,11 +119,11 @@
     <h2>Payment Method</h2>
     <ion-radio-group [(ngModel)]="selectedPaymentMethod" aria-label="Select Payment Method">
       <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="cash"></ion-radio>
-        <ion-label>In Store - Cash</ion-label>
+        <ion-radio  slot="start" value="cash"></ion-radio>
+        <ion-label >In Store - Cash</ion-label>
       </ion-item>
       <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="card"></ion-radio>
+        <ion-radio [disabled]="selectedOrderType === 'delivery'" slot="start" value="card"></ion-radio>
         <ion-label>In Store - Debit</ion-label>
       </ion-item>
       <ion-item lines="none" class="radio-item">

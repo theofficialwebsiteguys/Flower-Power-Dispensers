@@ -26,7 +26,7 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>(this.getCart());
   cart$ = this.cartSubject.asObservable(); 
   private inactivityTime = 0;
-  private inactivityLimit = 10 * 60; // 20 minutes
+  private inactivityLimit = 24 * 60 * 60; // 24 hours
   private userId: number | null = null; // Store user ID
   private lastNotificationKey = 'lastCartAbandonmentNotification';
 
@@ -155,7 +155,7 @@ export class CartService {
     this.saveCart([]);
   }
 
-  checkout(points_redeem: number): Observable<any> {
+  checkout(points_redeem: number, delivery_address: any): Observable<any> {
     const cartItems = this.getCart();
     const unmatchedItems = [...cartItems]; 
     const matchedCart: any[] = [];
@@ -223,10 +223,10 @@ export class CartService {
       id_external: null,
       id_location: 1000,
       id_status: 1,
-      type: 'retail',
+      type: delivery_address ? 'delivery' : 'pickup',
       use_type: 'adult',
       auto_apply_discount_exclusions: [],
-      delivery_address: null,
+      delivery_address: delivery_address,
       pickup_date: null,
       pickup_time: null,
       apply_delivery_fee: null,

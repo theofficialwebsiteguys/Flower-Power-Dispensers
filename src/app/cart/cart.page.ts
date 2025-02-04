@@ -23,8 +23,6 @@ export class CartPage {
 
   isLoading: boolean = false;
 
-  isRefreshing = false; 
-
   constructor(
     private readonly cartService: CartService,
     private toastController: ToastController,
@@ -63,14 +61,16 @@ export class CartPage {
   }
 
   async onOrderPlaced() {
-    this.showCheckout = false;
-    await this.presentToast('Your order has been placed successfully!');
     this.resetCart();
+    this.showCheckout = false;
     this.scrollToTop();
     this.accessibilityService.announce(
       'Your order was placed successfully.',
       'polite'
     );
+    console.log("redirecting")
+    this.redirectToCart();
+    //await this.presentToast('Your order has been placed successfully!');
   }
 
   ionViewDidEnter(): void {
@@ -96,6 +96,7 @@ export class CartPage {
   }
 
   resetCart() {
+    console.log("resetting cart")
     this.cartService.clearCart();
     this.cartItems = [];
     this.checkoutInfo = null;
@@ -103,17 +104,14 @@ export class CartPage {
   }
 
 
-  refreshPage(event: any) {
-    console.log('Refreshing Cart Page...');
-    this.isRefreshing = true; // Show loading animation
-
-    setTimeout(() => {
-      this.router.navigateByUrl('/cart', { skipLocationChange: true }).then(() => {
-        this.router.navigate(['/cart']);
-      });
-
-      this.isRefreshing = false; // Hide loading animation
-      event.target.complete(); // Stop refresher animation
-    }, 1000); // Adjust delay for better UX
+  private async redirectToCart() {
+    await this.router.navigateByUrl('/cart');
+    
+    // Force a full page reload after navigation
+    setTimeout(async () => {
+      location.reload();
+      await this.presentToast('Your order has been placed successfully!');
+    }, 500); // Small delay ensures the navigation completes first
   }
+
 }

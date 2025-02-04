@@ -40,12 +40,9 @@ export class CheckoutComponent implements OnInit {
 
   timeOptions: { value: string; display: string }[] = [];
 
-  selectedPaymentMethod: string = 'cash';
+  selectedPaymentMethod: string = '';
 
   selectedOrderType: string = 'pickup';
-
-  
-  
 
   @Output() back: EventEmitter<void> = new EventEmitter<void>();
   @Output() orderPlaced = new EventEmitter<void>();
@@ -64,7 +61,7 @@ export class CheckoutComponent implements OnInit {
     this.generateTimeOptions();
 
     window.AeroPay.init({
-      env: 'staging',
+      env: 'production',
     });
 
     const ap = window.AeroPay.button({
@@ -177,7 +174,13 @@ export class CheckoutComponent implements OnInit {
     let points_add = 0;
     const points_redeem = this.pointsToRedeem;
 
-    this.cartService.checkout(points_redeem).subscribe(
+    // Format the delivery address as a single string if order type is 'delivery'
+    let formattedAddress = '';
+    if (this.selectedOrderType === 'delivery') {
+      formattedAddress = `${this.deliveryAddress.street}, ${this.deliveryAddress.city}, ${this.deliveryAddress.state} ${this.deliveryAddress.zip}`;
+    }
+
+    this.cartService.checkout(points_redeem, this.selectedOrderType === 'delivery' ? formattedAddress : null).subscribe(
       (response) => {
         console.log('Final Response: ', response);
         pos_order_id = response.id_order;
@@ -202,7 +205,6 @@ export class CheckoutComponent implements OnInit {
                 'Your order has been placed successfully.',
                 'polite'
               );
-              this.redirectToCart();
             },
             error: async (error) => {
               loading.dismiss();
@@ -213,7 +215,6 @@ export class CheckoutComponent implements OnInit {
                 'There was an error placing your order. Please try again.',
                 'polite'
               );
-              this.redirectToCart();
             },
           });
       },
@@ -226,16 +227,11 @@ export class CheckoutComponent implements OnInit {
           'Checkout failed. Please try again.',
           'polite'
         );
-        this.redirectToCart();
+
       }
     );
   }
 
-  private redirectToCart() {
-    this.router.navigateByUrl('/cart').then(() => {
-      location.reload(); // Ensures a full reload of the cart page
-    });
-  }
 
   async presentToast(message: string, color: string = 'danger') {
     const toast = await this.toastController.create({
@@ -249,6 +245,9 @@ export class CheckoutComponent implements OnInit {
 
   onOrderTypeChange(event: any) {
     this.selectedOrderType = event.detail.value;
+    if(this.selectedOrderType === 'delivery'){
+      this.selectedPaymentMethod = 'aeropay';
+    }
   }
 
 }
