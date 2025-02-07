@@ -188,165 +188,275 @@ export class CartService {
             unmatchedItems.splice(matchIndex, 1);
           }
         });
-
-        // If there are unmatched items, fetch the next batch
-        if (unmatchedItems.length > 0 && inventoryResponse.length > 0) {
-          skip += take;
-          return fetchAndMatch();
-        }
-
-        // Return the matched cart when all batches are processed
-        return of(matchedCart);
-      }),
-      catchError((error) => {
-        console.error('Error during inventory matching:', error);
-        return throwError(() => error);
-      })
-    );
-  };
-
-
-  const getUserInfo = (): Observable<any> => {
-    return this.authService.getUserInfo().pipe(
-      map((info) => {
-        user_info = info;
-      }),
-      catchError((error) => {
-        console.error('Error fetching user info or creating customer:', error);
-        return throwError(() => error);
-      })
-    );
-  };
-
-  // Step 2: Create Order
-  const createOrder = (): Observable<any> => {
-    const orderDetails = {
-      id_customer: user_info.alleaves_customer_id, // Replace with actual customer ID
-      id_external: null,
-      id_location: 1000,
-      id_status: 1,
-      type: 'retail',
-      use_type: 'adult',
-      auto_apply_discount_exclusions: [],
-      delivery_address: null,
-      pickup_date: null,
-      pickup_time: null,
-      apply_delivery_fee: null,
-      delivery_fee: 0,
-      complete: false,
-      void: false,
-      void_reason: null,
-      void_reason_other: null,
-      verified: false,
-      verified_by: null,
-      packed: false,
-      packed_by: null,
-      scheduled: false,
-      scheduled_by: null,
-      id_user_working: null,
-    };
-
-    return this.createOrder(orderDetails).pipe(
-      tap((response) => {
-        id_order = response.id_order;
-        // console.log('Order Created:', response);
-      }),
-      catchError((error) => {
-        console.error('Error creating order:', error);
-        return throwError(() => error);
-      })
-    );
-  };
-
-  // Step 3: Add Checkout Items to Order
-  const addItemsToOrder = (orderId: number): Observable<any[]> => {
-    return this.addCheckoutItemsToOrder(orderId, checkoutItems).pipe(
-      tap((responses) => {
-        // console.log("Add Items to order responses", responses)
-        // Calculate the total subtotal
-        const totalSubtotal = responses.reduce(
-          (acc: number, item: any) => {
-            if (item) {
-              acc += item.price || 0;
-            }
-            return acc;
-          },
-          0 // Initial value for subtotal
-        );
-
-        // Set the external subtotal variable
-        subtotal = totalSubtotal;
-      }),
-      catchError((error) => {
-        console.error('Error adding items to order:', error);
-        return throwError(() => error);
-      })
-    );
-  };
-
-  const updateOrderItemPrices = (orderId: number, items: any[]): Observable<any> => {
-    let remainingDiscount = points_redeem / 20;
-    const sortedItems = [...items].sort((a, b) => b.price - a.price);
-
-    const updateRequests = sortedItems.map((item) => {
-      if (remainingDiscount <= 0) {
-        return of(null);
+        skip += take;
+        if (inventoryResponse.length === 0) break;
       }
-      const discountAmount = Math.min(item.price, remainingDiscount);
-      remainingDiscount -= discountAmount;
-      const priceOverride = item.price - discountAmount;
-
-      const body = {
-        price_override: priceOverride,
-        price_override_reason: 'Points redemption applied'
+      return matchedCart;
+    };
+  
+    const getUserInfo = async () => {
+      user_info = await this.authService.getCurrentUser();
+      console.log(user_info)
+    };
+    
+  
+    const createOrder = async () => {
+      const orderDetails = {
+        id_customer: user_info.alleaves_customer_id,
+        id_external: null,
+        id_location: 1000,
+        id_status: 1,
+        type: orderType,
+        use_type: 'adult',
+        auto_apply_discount_exclusions: [],
+        delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+        complete: false,
+        verified: false,
+        packed: false,
+        scheduled: false,
       };
-
-      const url = `https://app.alleaves.com/api/order/${orderId}/item/${item.id_item}`;
-
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
-        'Content-Type': 'application/json; charset=utf-8',
-        accept: 'application/json; charset=utf-8',
-      });
-
-      return this.http.put(url, body, { headers }).pipe(
-        // tap(() => console.log(`Updated item ${item.id_item} price to ${priceOverride}`)),
-        catchError((error) => {
-          console.error(`Error updating item ${item.id_item} price:`, error);
-          return throwError(() => error);
-        })
-      );
-    });
-
-    return forkJoin(updateRequests);
-  };
-
-
-  return getUserInfo().pipe(
-    switchMap(() => fetchAndMatch()),
-    switchMap((matched) => {
-      checkoutItems = matched;
-      return createOrder();
-    }),
-    switchMap((orderResponse) => 
-      addItemsToOrder(orderResponse.id_order)
-    ),
-    switchMap((addedItemsWithIds) => {
-      checkoutItems = addedItemsWithIds; // Store items with id_item
-      return updateOrderItemPrices(id_order, checkoutItems);
-    }),
-    map(() => ({
-      user_info,
-      id_order,
-      checkoutItems,
-      subtotal,
-    })),
-    catchError((error) => {
-      console.error('Checkout process failed:', error);
-      return throwError(() => error);
-    })
-  );
+      const response = await this.createOrder(orderDetails);
+      id_order = response.id_order;
+    };
+  
+    const addItemsToOrder = async () => {
+      const responses = await this.addCheckoutItemsToOrder(id_order, checkoutItems);
+      subtotal = responses.reduce((acc: number, item: any) => acc + (item.price || 0), 0);
+    };
+  
+    const updateOrderItemPrices = async () => {
+      let remainingDiscount = points_redeem / 20;
+      const sortedItems = [...checkoutItems].sort((a, b) => b.price - a.price);
+      for (const item of sortedItems) {
+        if (remainingDiscount <= 0) break;
+        const discountAmount = Math.min(item.price, remainingDiscount);
+        remainingDiscount -= discountAmount;
+        const priceOverride = item.price - discountAmount;
+        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+        const headers = {
+          Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+          'Content-Type': 'application/json; charset=utf-8',
+          Accept: 'application/json; charset=utf-8',
+        };
+        const options = {
+          url: url,
+          method: 'PUT',
+          headers: headers,
+          data: {
+            price_override: priceOverride,
+            price_override_reason: 'Points redemption applied',
+          },
+        };
+        await CapacitorHttp.request(options);
+      }
+    };
+  
+    return (async () => {
+      try {
+        await getUserInfo();
+        checkoutItems = await fetchAndMatch();
+        await createOrder();
+        await addItemsToOrder();
+        await updateOrderItemPrices();
+        return { user_info, id_order, checkoutItems, subtotal };
+      } catch (error) {
+        console.error('Checkout process failed:', error);
+        throw error;
+      }
+    })();
   }
+  
+
+  // checkout(points_redeem: number, orderType: string, deliveryAddress: any): Observable<any> {
+  //   const cartItems = this.getCart();
+  //   const unmatchedItems = [...cartItems]; 
+  //   const matchedCart: any[] = [];
+  //   let skip = 0;
+  //   const take = 5000;
+  
+  //   let id_order = 0;
+  //   let tax_amount = 0;
+  //   let subtotal = 0;
+  //   let user_info: any;
+  //   let id_customer: any;
+  //   let checkoutItems: any[] = [];
+  
+  // const fetchAndMatch = (): Observable<any[]> => {
+  //   return this.fetchInventory(skip, take).pipe(
+  //     switchMap((inventoryResponse) => {
+  //       // Match items
+  //       inventoryResponse.forEach((inventoryItem: any) => {
+  //         const matchIndex = unmatchedItems.findIndex(
+  //           (cartItem) => +cartItem.posProductId === inventoryItem.id_item
+  //         );
+
+  //         if (matchIndex !== -1) {
+  //           matchedCart.push({
+  //             ...unmatchedItems[matchIndex],
+  //             id_batch: inventoryItem.id_batch,
+  //           });
+  //           unmatchedItems.splice(matchIndex, 1);
+  //         }
+  //       });
+
+  //       // If there are unmatched items, fetch the next batch
+  //       if (unmatchedItems.length > 0 && inventoryResponse.length > 0) {
+  //         skip += take;
+  //         return fetchAndMatch();
+  //       }
+
+  //       // Return the matched cart when all batches are processed
+  //       return of(matchedCart);
+  //     }),
+  //     catchError((error) => {
+  //       console.error('Error during inventory matching:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // };
+
+
+  // const getUserInfo = (): Observable<any> => {
+  //   return this.authService.getUserInfo().pipe(
+  //     map((info) => {
+  //       user_info = info;
+  //     }),
+  //     catchError((error) => {
+  //       console.error('Error fetching user info or creating customer:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // };
+
+  // // Step 2: Create Order
+  // const createOrder = (): Observable<any> => {
+  //   const orderDetails = {
+  //     id_customer: user_info.alleaves_customer_id, // Replace with actual customer ID
+  //     id_external: null,
+  //     id_location: 1000,
+  //     id_status: 1,
+  //     type: orderType, 
+  //     use_type: 'adult',
+  //     auto_apply_discount_exclusions: [],
+  //     delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+  //     pickup_date: null,
+  //     pickup_time: null,
+  //     apply_delivery_fee: null,
+  //     delivery_fee: 0,
+  //     complete: false,
+  //     void: false,
+  //     void_reason: null,
+  //     void_reason_other: null,
+  //     verified: false,
+  //     verified_by: null,
+  //     packed: false,
+  //     packed_by: null,
+  //     scheduled: false,
+  //     scheduled_by: null,
+  //     id_user_working: null,
+  //   };
+
+  //   return this.createOrder(orderDetails).pipe(
+  //     tap((response) => {
+  //       id_order = response.id_order;
+  //       // console.log('Order Created:', response);
+  //     }),
+  //     catchError((error) => {
+  //       console.error('Error creating order:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // };
+
+  // // Step 3: Add Checkout Items to Order
+  // const addItemsToOrder = (orderId: number): Observable<any[]> => {
+  //   return this.addCheckoutItemsToOrder(orderId, checkoutItems).pipe(
+  //     tap((responses) => {
+  //       // console.log("Add Items to order responses", responses)
+  //       // Calculate the total subtotal
+  //       const totalSubtotal = responses.reduce(
+  //         (acc: number, item: any) => {
+  //           if (item) {
+  //             acc += item.price || 0;
+  //           }
+  //           return acc;
+  //         },
+  //         0 // Initial value for subtotal
+  //       );
+
+  //       // Set the external subtotal variable
+  //       subtotal = totalSubtotal;
+  //     }),
+  //     catchError((error) => {
+  //       console.error('Error adding items to order:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // };
+
+  // const updateOrderItemPrices = (orderId: number, items: any[]): Observable<any> => {
+  //   let remainingDiscount = points_redeem / 20;
+  //   const sortedItems = [...items].sort((a, b) => b.price - a.price);
+
+  //   const updateRequests = sortedItems.map((item) => {
+  //     if (remainingDiscount <= 0) {
+  //       return of(null);
+  //     }
+  //     const discountAmount = Math.min(item.price, remainingDiscount);
+  //     remainingDiscount -= discountAmount;
+  //     const priceOverride = item.price - discountAmount;
+
+  //     const body = {
+  //       price_override: priceOverride,
+  //       price_override_reason: 'Points redemption applied'
+  //     };
+
+  //     const url = `https://app.alleaves.com/api/order/${orderId}/item/${item.id_item}`;
+
+  //     const headers = new HttpHeaders({
+  //       Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+  //       'Content-Type': 'application/json; charset=utf-8',
+  //       accept: 'application/json; charset=utf-8',
+  //     });
+
+  //     return this.http.put(url, body, { headers }).pipe(
+  //       // tap(() => console.log(`Updated item ${item.id_item} price to ${priceOverride}`)),
+  //       catchError((error) => {
+  //         console.error(`Error updating item ${item.id_item} price:`, error);
+  //         return throwError(() => error);
+  //       })
+  //     );
+  //   });
+
+  //   return forkJoin(updateRequests);
+  // };
+
+
+  // return getUserInfo().pipe(
+  //   switchMap(() => fetchAndMatch()),
+  //   switchMap((matched) => {
+  //     checkoutItems = matched;
+  //     return createOrder();
+  //   }),
+  //   switchMap((orderResponse) => 
+  //     addItemsToOrder(orderResponse.id_order)
+  //   ),
+  //   switchMap((addedItemsWithIds) => {
+  //     checkoutItems = addedItemsWithIds; // Store items with id_item
+  //     return updateOrderItemPrices(id_order, checkoutItems);
+  //   }),
+  //   map(() => ({
+  //     user_info,
+  //     id_order,
+  //     checkoutItems,
+  //     subtotal,
+  //   })),
+  //   catchError((error) => {
+  //     console.error('Checkout process failed:', error);
+  //     return throwError(() => error);
+  //   })
+  // );
+  // }
   
 
   // Save the cart back to sessionStorage and notify subscribers
