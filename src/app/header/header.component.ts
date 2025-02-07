@@ -17,7 +17,7 @@ export class HeaderComponent {
   userPoints = 0;
   cartItemCount = 0;
   showNotifications = false;
-  unreadCount = 2; // Example unread count
+  unreadCount = 0; // Example unread count
 
   notifications: any[] = [];
 

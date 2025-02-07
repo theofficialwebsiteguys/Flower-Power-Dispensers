@@ -3,6 +3,7 @@ import { CartItem, CartService } from '../cart.service';
 import { IonContent, LoadingController, ToastController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 import { AccessibilityService } from '../accessibility.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -27,7 +28,8 @@ export class CartPage {
     private toastController: ToastController,
     private loadingController: LoadingController,
     private authService: AuthService,
-    private accessibilityService: AccessibilityService
+    private accessibilityService: AccessibilityService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -59,14 +61,16 @@ export class CartPage {
   }
 
   async onOrderPlaced() {
-    this.showCheckout = false;
-    await this.presentToast('Your order has been placed successfully!');
     this.resetCart();
+    this.showCheckout = false;
     this.scrollToTop();
     this.accessibilityService.announce(
       'Your order was placed successfully.',
       'polite'
     );
+    console.log("redirecting")
+    this.redirectToCart();
+    //await this.presentToast('Your order has been placed successfully!');
   }
 
   ionViewDidEnter(): void {
@@ -92,9 +96,22 @@ export class CartPage {
   }
 
   resetCart() {
+    console.log("resetting cart")
     this.cartService.clearCart();
     this.cartItems = [];
     this.checkoutInfo = null;
     this.accessibilityService.announce('Your cart has been cleared.', 'polite');
   }
+
+
+  private async redirectToCart() {
+    await this.router.navigateByUrl('/cart');
+    
+    // Force a full page reload after navigation
+    setTimeout(async () => {
+      location.reload();
+      await this.presentToast('Your order has been placed successfully!');
+    }, 500); // Small delay ensures the navigation completes first
+  }
+
 }

@@ -43,7 +43,7 @@ export class CheckoutComponent implements OnInit {
 
   timeOptions: { value: string; display: string }[] = [];
 
-  selectedPaymentMethod: string = 'cash';
+  selectedPaymentMethod: string = '';
 
   selectedOrderType: string = 'pickup';
 
@@ -334,11 +334,6 @@ export class CheckoutComponent implements OnInit {
       this.destroy$.complete();
   }
 
-  private redirectToCart() {
-    this.router.navigateByUrl('/cart').then(() => {
-      location.reload(); // Ensures a full reload of the cart page
-    });
-  }
 
   async presentToast(message: string, color: string = 'danger') {
     const toast = await this.toastController.create({
