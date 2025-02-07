@@ -27,7 +27,7 @@ export class CartService {
   private cartSubject = new BehaviorSubject<CartItem[]>(this.getCart());
   cart$ = this.cartSubject.asObservable(); 
   private inactivityTime = 0;
-  private inactivityLimit = 24 * 60 * 60; // 24 hours
+  private inactivityLimit = 24 * 24 * 60; // 24 hours
   private userId: number | null = null; // Store user ID
   private lastNotificationKey = 'lastCartAbandonmentNotification';
 
@@ -162,7 +162,7 @@ export class CartService {
     this.saveCart([]);
   }
 
-  checkout(points_redeem: number): Observable<any> {
+  checkout(points_redeem: number, orderType: string, deliveryAddress: any) {
     const cartItems = this.getCart();
     const unmatchedItems = [...cartItems];
     const matchedCart: any[] = [];
