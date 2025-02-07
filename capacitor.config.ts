@@ -4,7 +4,15 @@ const config: CapacitorConfig = {
   appId: 'com.flowerpowerdispensers.app',
   appName: 'Flower Power Dispensers',
   webDir: 'www',
+  server: {
+    hostname: "com.flowerpowerdispensers.app",
+    androidScheme: "https",
+    allowNavigation: ["pay.aero.inc"]
+  },
   plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
     SplashScreen: {
       launchShowDuration: 0, // Disables Capacitor's default splash screen to use custom Angular component
     },

@@ -1,11 +1,11 @@
 export type ProductCategory =
   | 'FLOWER'
-  | 'PRE_ROLLS'
+  | 'PREROLL'
   | 'VAPORIZERS'
   | 'CONCENTRATES'
-  | 'BEVERAGES'
+  | 'BEVERAGE'
   | 'TINCTURES'
-  | 'EDIBLES'
+  | 'EDIBLE'
   | 'ACCESSORIES';
 
   export interface CategoryWithImage {

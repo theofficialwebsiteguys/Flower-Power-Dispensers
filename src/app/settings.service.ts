@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { CapacitorHttp } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root',
@@ -41,30 +42,81 @@ export class SettingsService {
       : this.document.body.classList.remove('dark-mode');
   }
 
-  getUserNotifications(): Observable<any> {
-    const userId = this.authService.getCurrentUser().id;
-    const url = `${environment.apiUrl}/notifications/all?userId=${userId}`;
-    return this.http.get<any>(url);
+  async getUserNotifications(): Promise<any> {
+    try {
+      const userId = this.authService.getCurrentUser().id;
+      const url = `${environment.apiUrl}/notifications/all?userId=${userId}`;
+  
+      const response = await CapacitorHttp.get({ url });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user notifications:', JSON.stringify(error));
+      return null;
+    }
   }
-
-  markNotificationAsRead(notificationId: number): Observable<any> {
-    const url = `${environment.apiUrl}/notifications/mark-read/${notificationId}`;
-    return this.http.put(url, {});
+  
+  async markNotificationAsRead(notificationId: number): Promise<any> {
+    try {
+      const url = `${environment.apiUrl}/notifications/mark-read/${notificationId}`;
+  
+      const response = await CapacitorHttp.put({
+        url,
+        headers: { 'Content-Type': 'application/json' },
+        data: {},
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error marking notification as read:', JSON.stringify(error));
+      return null;
+    }
   }
-
-  markAllNotificationsAsRead(userId: number): Observable<any> {
-    const url = `${environment.apiUrl}/notifications/mark-all-read`;
-    return this.http.put(url, { userId });
+  
+  async markAllNotificationsAsRead(userId: number): Promise<any> {
+    try {
+      const url = `${environment.apiUrl}/notifications/mark-all-read`;
+  
+      const response = await CapacitorHttp.put({
+        url,
+        headers: { 'Content-Type': 'application/json' },
+        data: { userId },
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', JSON.stringify(error));
+      return null;
+    }
   }
-
-  deleteNotification(notificationId: number): Observable<any> {
-    const url = `${environment.apiUrl}/notifications/delete/${notificationId}`;
-    return this.http.delete(url);
+  
+  async deleteNotification(notificationId: number): Promise<any> {
+    try {
+      const url = `${environment.apiUrl}/notifications/delete/${notificationId}`;
+  
+      const response = await CapacitorHttp.delete({ url });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting notification:', JSON.stringify(error));
+      return null;
+    }
   }
-
-  deleteAllNotifications(userId: number): Observable<any> {
-    const url = `${environment.apiUrl}/notifications/delete-all`;
-    return this.http.delete(url, { body: { userId } });
+  
+  async deleteAllNotifications(userId: number): Promise<any> {
+    try {
+      const url = `${environment.apiUrl}/notifications/delete-all`;
+  
+      const response = await CapacitorHttp.delete({
+        url,
+        headers: { 'Content-Type': 'application/json' },
+        data: { userId },
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting all notifications:', JSON.stringify(error));
+      return null;
+    }
   }
 
   private isDarkModeEnabled = new BehaviorSubject<boolean>(

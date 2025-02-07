@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, combineLatest, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CapacitorHttp } from '@capacitor/core';
 
 import { ProductCategory, CategoryWithImage } from './product-category/product-category.model';
 import {
@@ -54,21 +55,31 @@ export class ProductsService {
       return of(this.products.value); // Return existing products as an Observable
     }
   
-    return this.http
-      .get<Product[]>(`${environment.apiUrl}/products/all-products`, {
-        params: { venueId: environment.venueId },
-      })
-      .pipe(
-        tap((products) => {
-          const sortedProducts = this.sortProducts(products);
-          this.products.next(sortedProducts);
-          this.saveProductsToSessionStorage(sortedProducts);
-        }),
-        catchError((error) => {
-          console.error('Error fetching products from backend:', error);
-          return throwError(() => error);
+    const options = {
+      url: `${environment.apiUrl}/products/all-products`,
+      params: { venueId: environment.venueId },
+      headers: { 'Content-Type': 'application/json' },
+    };
+  
+    return new Observable<Product[]>((observer) => {
+      CapacitorHttp.get(options)
+        .then((response) => {
+          if (response.status === 200) {
+            const sortedProducts = this.sortProducts(response.data);
+            this.products.next(sortedProducts);
+            this.saveProductsToSessionStorage(sortedProducts);
+            observer.next(sortedProducts);
+            observer.complete();
+          } else {
+            console.error('API request failed:', response);
+            observer.error(response);
+          }
         })
-      );
+        .catch((error) => {
+          console.error('Error fetching products:', error);
+          observer.error(error);
+        });
+    });
   }
   
 
@@ -217,11 +228,11 @@ export class ProductsService {
   getCategories(): CategoryWithImage[] {
     return [
       { category: 'FLOWER', imageUrl: 'assets/icons/flower.png' },
-      { category: 'PRE_ROLLS', imageUrl: 'assets/icons/prerolls.png' },
+      { category: 'PREROLL', imageUrl: 'assets/icons/prerolls.png' },
       { category: 'CONCENTRATES', imageUrl: 'assets/icons/concentrates.png' },
-      { category: 'BEVERAGES', imageUrl: 'assets/icons/beverages.png' },
+      { category: 'BEVERAGE', imageUrl: 'assets/icons/beverages.png' },
       { category: 'TINCTURES', imageUrl: 'assets/icons/tinctures.png' },
-      { category: 'EDIBLES', imageUrl: 'assets/icons/edibles.png' },
+      { category: 'EDIBLE', imageUrl: 'assets/icons/edibles.png' },
       { category: 'ACCESSORIES', imageUrl: 'assets/icons/accessories.png' },
     ];
   }

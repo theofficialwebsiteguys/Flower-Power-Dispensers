@@ -1,7 +1,7 @@
 <div *ngFor="let category of categories" class="category-section">
   <div class="section-header">
     <a (click)="updateCategory(category.category)" class="view-all" role="button" [attr.aria-label]="'View all products in ' + category.category ">
-      <h2>{{ category.category === "PRE_ROLLS" ? "Pre Rolls" : category.category.toLowerCase() }}</h2>
+      <h2>{{ category.category === "PREROLL" ? "Pre Rolls" : category.category.toLowerCase() }}</h2>
       <ion-icon name="arrow-forward-outline" class="arrow-icon" aria-hidden="true"></ion-icon>
     </a>
   </div>

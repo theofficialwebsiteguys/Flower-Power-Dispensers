@@ -18,7 +18,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(private productService: ProductsService, private accessibilityService: AccessibilityService) {}
 
-  currentCategory: ProductCategory = 'PRE_ROLLS';
+  currentCategory: ProductCategory = 'PREROLL';
   products$: Observable<Product[]> = of([]);
 
   ngOnInit() {

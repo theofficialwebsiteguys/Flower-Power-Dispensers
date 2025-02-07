@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -93,14 +93,19 @@ export class FcmService {
   private async getTokenFromBackend(email: string) {
     try {
       const sessionData = localStorage.getItem('sessionData');
-      const headers = new HttpHeaders({
-        Authorization: sessionData ? JSON.parse(sessionData).token : null,
+      const token = sessionData ? JSON.parse(sessionData).token : null;
+  
+      const response = await CapacitorHttp.post({
+        url: `${environment.apiUrl}/users/push-token`,
+        headers: {
+          Authorization: token || '',
+          'Content-Type': 'application/json',
+        },
+        data: { email },
       });
-      const response = await lastValueFrom(
-        this.http.post(`${environment.apiUrl}/users/push-token`, { email }, { headers })
-      );
-      return response || null;
-    } catch (error: any) {
+  
+      return response.data || null;
+    } catch (error) {
       console.error('Error retrieving token from backend:', JSON.stringify(error));
       return null;
     }
@@ -109,18 +114,20 @@ export class FcmService {
   private async updateTokenInBackend(email: string, token: string) {
     try {
       const sessionData = localStorage.getItem('sessionData');
-      const headers = new HttpHeaders({
-        Authorization: sessionData ? JSON.parse(sessionData).token : null, // Set Authorization header
+      const authToken = sessionData ? JSON.parse(sessionData).token : null;
+  
+      const response = await CapacitorHttp.post({
+        url: `${environment.apiUrl}/users/update-push-token`,
+        headers: {
+          Authorization: authToken || '',
+          'Content-Type': 'application/json',
+        },
+        data: { email, token },
       });
   
-      const response = await lastValueFrom(
-        this.http.post(`${environment.apiUrl}/users/update-push-token`, { email, token }, { headers })
-      );
-  
-      console.log('Token updated in backend:', response);
-    } catch (error: any) {
+      console.log('Token updated in backend:', response.data);
+    } catch (error) {
       console.error('Error updating token in backend:', JSON.stringify(error));
-      
     }
   }
 
@@ -140,15 +147,20 @@ export class FcmService {
   private async removeNotificationsFromBackend(email: string) {
     try {
       const sessionData = localStorage.getItem('sessionData');
-      const headers = new HttpHeaders({
-        Authorization: sessionData ? JSON.parse(sessionData).token : null, // Set Authorization header
+      const authToken = sessionData ? JSON.parse(sessionData).token : null;
+  
+      const response = await CapacitorHttp.post({
+        url: `${environment.apiUrl}/users/toggle-notifications`,
+        headers: {
+          Authorization: authToken || '',
+          'Content-Type': 'application/json',
+        },
+        data: { email },
       });
-      const response = await lastValueFrom(
-        this.http.post(`${environment.apiUrl}/users/toggle-notifications`, { email }, { headers })
-      );
-      console.log('Push token removed from backend:', response);
+  
+      console.log('Push token removed from backend:', response.data);
     } catch (error) {
-      console.error('Error removing token from backend:', error);
+      console.error('Error removing token from backend:', JSON.stringify(error));
     }
   }
 }
