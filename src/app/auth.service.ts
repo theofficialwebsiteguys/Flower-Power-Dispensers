@@ -329,20 +329,38 @@ export class AuthService {
   }
 
   async getUserOrders(): Promise<any> {
-    return CapacitorHttp.get({
-      url: `${environment.apiUrl}/orders/user`,
-      headers: this.getHeaders(),
-      params: { user_id: this.getCurrentUser().id },
-    })
-      .then((response) => {
-        this.handleRecentOrders(response.data);
-        this.updateUserData();
-        return response.data; // Resolve with data
-      })
-      .catch((error) => {
-        console.error("Error fetching user orders:", error);
-        throw error; // Rethrow to catch in placeOrder()
+    try {
+      const response = await CapacitorHttp.get({
+        url: `${environment.apiUrl}/orders/user`,
+        headers: this.getHeaders(),
+        params: { user_id: String(this.getCurrentUser().id) }, // Ensure it's a string
       });
+  
+      console.log("API Response:", response);
+      console.log("Response Data Type:", typeof response.data);
+  
+      // Handle cases where the response is not an object
+      if (typeof response.data === "number") {
+        response.data = String(response.data); // Convert to string
+      }
+  
+      // Ensure JSON parsing if needed
+      try {
+        if (typeof response.data === "string") {
+          response.data = JSON.parse(response.data);
+        }
+      } catch (e) {
+        console.warn("Failed to parse response:", e);
+      }
+  
+      this.handleRecentOrders(response.data);
+      this.updateUserData();
+  
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user orders:", error);
+      throw error;
+    }
   }
   
 
