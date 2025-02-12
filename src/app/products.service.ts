@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Product } from './product/product.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, filter, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { CapacitorHttp } from '@capacitor/core';
 
@@ -82,9 +82,10 @@ export class ProductsService {
     });
   }
   
-
   getProducts(): Observable<Product[]> {
-    return this.products$;
+    return this.products$.pipe(
+      filter(products => products.length > 0) // Only emit if products exist
+    );
   }
 
   private sortProducts(products: Product[]): Product[] {
@@ -93,6 +94,7 @@ export class ProductsService {
 
   getFilteredProducts(): Observable<Product[]> {
     return this.products$.pipe(
+      filter((productArray) => productArray.length > 0),
       map((productArray) => {
         const {
           sortMethod: { criterion, direction },
@@ -176,7 +178,8 @@ export class ProductsService {
               return result;
             }
           );
-      })
+      }),
+      filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
     );
   }
   

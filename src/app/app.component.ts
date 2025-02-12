@@ -70,7 +70,8 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.checkGeoLocation();
+    //this.checkGeoLocation();
+    this.initializeApp();
   }
   
   initializeApp() {

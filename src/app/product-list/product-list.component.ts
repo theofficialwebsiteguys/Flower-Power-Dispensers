@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, startWith } from 'rxjs';
 
 import { ProductsService } from '../products.service';
 
@@ -46,9 +46,9 @@ export class ProductListComponent implements OnInit {
 
   private updateProducts() {
     if (this.showSimilarItems) {
-      this.products$ = this.productService.getSimilarItems();
+      this.products$ = this.productService.getSimilarItems().pipe(startWith([]));
     } else {
-      this.products$ = this.productService.getFilteredProducts();
+      this.products$ = this.productService.getFilteredProducts().pipe(startWith([]));
     }
   }
 }

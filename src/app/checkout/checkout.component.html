@@ -123,7 +123,8 @@
 
   <div class="section payment-method">
     <h2>Payment Method</h2>
-    <ion-radio-group [(ngModel)]="selectedPaymentMethod" aria-label="Select Payment Method">
+    <ion-radio-group [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange($event)" aria-label="Select Payment Method">
+
       <ion-item lines="none" class="radio-item">
         <ion-radio [disabled]="selectedOrderType === 'delivery'" slot="start" value="cash"></ion-radio>
         <ion-label>In Store - Cash</ion-label>
@@ -136,10 +137,40 @@
         <ion-radio slot="start" value="aeropay"></ion-radio>
         <ion-label class="aeropay-label">
           <img class="aeropay-image" src="assets/aeropay.png" alt="Powered by Aeropay">
-          <div
-            id="aeropay-button-container"
-            aria-label="Aeropay payment option"
-          ></div>
+
+          <div *ngIf="isFetchingAeroPay" class="loading-container">
+            <ion-spinner name="crescent"></ion-spinner>
+            <p> Fetching AeroPay details...</p>
+          </div>
+
+          <div *ngIf="verificationRequired" class="verification-container">
+            <p>Enter the verification code sent to your email:</p>
+            <ion-input [(ngModel)]="verificationCode" placeholder="Verification Code"></ion-input>
+            <ion-button (click)="verifyAeroPayUser()">Verify</ion-button>
+          </div>
+          <div *ngIf="showBankSelection">
+            <ion-list>
+              <ion-item 
+                *ngFor="let bank of userBankAccounts" 
+                (click)="selectBank(bank.bankAccountId)"
+                [class.selected-bank]="selectedBankId === bank.bankAccountId"
+              >
+                <ion-avatar slot="start">
+                  <ion-icon name="card-outline" size="large"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <h3>{{ bank.bankName }}</h3>
+                  <p>Checking - ****{{ bank.accountLast4 }}</p>
+                </ion-label>
+                <ion-icon *ngIf="selectedBankId === bank.bankAccountId" name="checkmark-circle" color="success" slot="end"></ion-icon>
+              </ion-item>
+            </ion-list>
+          
+            <ion-button (click)="retrieveAerosyncCredentials()" expand="full" color="primary">
+              <ion-spinner *ngIf="loadingAerosync" name="crescent"></ion-spinner>
+              <span *ngIf="!loadingAerosync">Connect Another Bank</span>
+            </ion-button>
+          </div>
         </ion-label>
       </ion-item>
     </ion-radio-group>
@@ -209,8 +240,10 @@
   expand="block"
   class="sticky-footer"
   (click)="placeOrder()"
-  [disabled]="selectedPaymentMethod === 'aeropay'"
+  [disabled]="selectedPaymentMethod === 'aeropay' && !selectedBankId"
   aria-label="Place your order"
 >
   Submit Order
 </ion-button>
+
+<div id="widget"></div>  

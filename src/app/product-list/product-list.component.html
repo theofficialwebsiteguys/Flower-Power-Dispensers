@@ -1,10 +1,20 @@
 <ion-col role="list" aria-label="Filtered product list">
-  <ng-container *ngFor="let product of products$ | async">
-    <app-product
-      *ngIf="product.category === currentCategory"
-      [product]="product"
-      role="listitem"
-      [attr.aria-label]="'View details for ' + product.title"
-    ></app-product>
+  <ng-container *ngIf="(products$ | async) as products; else loading">
+    <ng-container *ngIf="products.length > 0; else loading">
+      <ng-container *ngFor="let product of products">
+        <app-product
+          *ngIf="product.category === currentCategory"
+          [product]="product"
+          role="listitem"
+          [attr.aria-label]="'View details for ' + product.title"
+        ></app-product>
+      </ng-container>
+    </ng-container>
   </ng-container>
+
+  <ng-template #loading>
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  </ng-template>
 </ion-col>

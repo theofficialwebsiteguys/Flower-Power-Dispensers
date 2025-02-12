@@ -3,11 +3,8 @@ import { Inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   BehaviorSubject,
-  catchError,
-  map,
-  Observable,
-  tap,
-  throwError,
+  filter,
+  Observable
 } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { FcmService } from './fcm.service';
@@ -302,7 +299,9 @@ export class AuthService {
   }
 
   get orders() {
-   return this.enrichedOrders.asObservable();
+    return this.enrichedOrders.asObservable().pipe(
+      filter((orders) => orders && orders.length > 0) // Only emit when orders exist
+    );
   }
 
 

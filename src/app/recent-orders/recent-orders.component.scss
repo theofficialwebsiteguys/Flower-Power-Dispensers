@@ -99,3 +99,19 @@
     cursor: pointer;
     font-size: 14px;
   }
+
+  .loading-container{
+    text-align: center;
+    margin: auto;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: black;
+    text-align: center;
+    margin: auto;
+  }
+  

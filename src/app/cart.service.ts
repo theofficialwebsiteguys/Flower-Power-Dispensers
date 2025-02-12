@@ -17,6 +17,7 @@ export interface CartItem {
   strainType: string;
   thc: string;
   weight: string;
+  category: string;
 }
 
 @Injectable({
@@ -597,8 +598,8 @@ export class CartService {
   }
   
 
-  async placeOrder(user_id: number, pos_order_id: number, points_add: number, points_redeem: number, amount: number) {
-    const payload = { user_id, pos_order_id, points_add, points_redeem, amount };
+  async placeOrder(user_id: number, pos_order_id: number, points_add: number, points_redeem: number, amount: number, cart: any) {
+    const payload = { user_id, pos_order_id, points_add, points_redeem, amount, cart };
   
     console.log(payload);
   

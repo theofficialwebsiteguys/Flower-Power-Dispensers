@@ -55,11 +55,13 @@
       border-radius: 8px;
       --padding-start: 12px;
       margin-bottom: 16px;
+      z-index: 0;
     }
 
     .radio-item {
       margin: 12px 0;
       align-items: flex-start;
+      z-index: 0;
 
       ion-radio {
         --size: 20px;
@@ -95,6 +97,11 @@
   }
 }
 
+.selected-bank {
+  background: rgba(0, 128, 0, 0.1); /* Light green background */
+  border-left: 4px solid green;
+  transition: background 0.3s ease, border-left 0.3s ease;
+}
 
 .sticky-footer {
   position: fixed;
@@ -127,7 +134,7 @@
 
 .date-picker-container {
   position: relative; /* Establishes a new stacking context for the tooltip */
-  z-index: 2; 
+  z-index: 0; 
   .tooltip-calendar {
     position: absolute;
     top: 50px; /* Adjust to the correct position */
@@ -201,6 +208,16 @@
   max-width: 60%;
   margin-top: 5px;
 }
+
+.loading-container{
+  display: flex;
+  margin-top: 20px;
+}
+
+#widget {
+  margin-top: 20px;
+}
+
 
 ion-radio::part(container) {
   -webkit-appearance: none;

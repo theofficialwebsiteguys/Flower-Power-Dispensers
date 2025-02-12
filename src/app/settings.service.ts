@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, from, map, Observable } from 'rxjs';
 
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { CapacitorHttp } from '@capacitor/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CapacitorHttp, HttpResponse } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root',
@@ -123,4 +123,25 @@ export class SettingsService {
     this.getDarkModeEnabled()
   );
   isDarkModeEnabled$ = this.isDarkModeEnabled.asObservable();
+  
+  getCarouselImages(): Observable<{ images: string[] }> {
+    const url = `${environment.apiUrl}/notifications/images`;
+    console.log('Fetching images from:', url); // Log the request URL
+  
+    const options = {
+      method: 'GET',
+      url
+    };
+  
+    return from(CapacitorHttp.request(options)).pipe(
+      map((response: HttpResponse) => {
+        console.log('Response received:', JSON.stringify(response)); // Log the full response
+        return response.data; // Extract the `data` property
+      }),
+      catchError((error) => {
+        console.error('Error fetching carousel images:', error); // Log any error
+        throw error;
+      })
+    );
+  }
 }

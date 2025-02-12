@@ -60,7 +60,7 @@ img {
 .heading-container {
   position: sticky;
   top: 0;
-  z-index: 10000; /* Increase above carousel */
+  z-index: 1; /* Increase above carousel */
   background: #fff;
   padding: calc(5px + env(safe-area-inset-top)) 5px 5px 5px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -149,7 +149,6 @@ ion-icon[name="cart-outline"] {
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: #f9f9f9;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -158,7 +157,6 @@ ion-icon[name="cart-outline"] {
 }
 
 .notification-item.unread {
-  background-color: #e1f5fe;
   font-weight: bold;
 }
 
