@@ -15,15 +15,24 @@ export class AeropayService {
   constructor() {}
 
   private async httpPost(url: string, data: any, token?: string): Promise<any> {
+    const headers: any = {
+      'Content-Type': 'application/json',
+      'accept': 'application/json',
+      ...(token ? { 'authorizationToken': `Bearer ${token}` } : {})
+    };
+  
+    // Add 'X-API-Version': '1.1' if the request is for creating a user
+    if (url.includes('/user')) {
+      headers['X-API-Version'] = '1.1';
+    }
+    console.log(headers)
+  
     const options: any = {
       url: url,
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-        ...(token ? { 'authorizationToken': `Bearer ${token}` } : {})
-      },
+      headers: headers,
       data: data,
     };
+  
     return CapacitorHttp.post(options);
   }
 
@@ -44,9 +53,9 @@ export class AeropayService {
       scope: 'merchant',
       api_key: environment.aeropay_api_key,
       api_secret: environment.aeropay_api_secret,
-      id: '1760',
+      id: '1689',
     };
-    return from(this.httpPost(`https://staging-api.aeropay.com/token`, payload)).pipe(
+    return from(this.httpPost(`https://api.aeropay.com/token`, payload)).pipe(
       tap(response => {
         if (response.data?.token) {
           this.setMerchantToken(response.data.token, response.data.TTL);
@@ -60,10 +69,10 @@ export class AeropayService {
       scope: 'userForMerchant',
       api_key: environment.aeropay_api_key,
       api_secret: environment.aeropay_api_secret,
-      id: '1760',
+      id: '1689',
       userId: userId
     };
-    return from(this.httpPost(`https://staging-api.aeropay.com/token`, payload)).pipe(
+    return from(this.httpPost(`https://api.aeropay.com/token`, payload)).pipe(
       tap(response => {
         if (response.data?.token) {
           this.setUsedForMerchantToken(response.data.token, response.data.TTL);
@@ -73,20 +82,20 @@ export class AeropayService {
   }
 
   createUser(userData: any): Observable<any> {
-    return from(this.httpPost('https://staging-api.aeropay.com/user', userData, this.getMerchantToken() || '')).pipe(
-      tap(response => console.log('✅ User Created:', response))
+    return from(this.httpPost('https://api.aeropay.com/user', userData, this.getMerchantToken() || '')).pipe(
+      tap(response => console.log(response))
     );
   }
 
   verifyUser(userId: string, code: string): Observable<any> {
-    return from(this.httpPost('https://staging-api.aeropay.com/confirmUser', { userId, code }, this.getMerchantToken() || '')).pipe(
-      tap(response => console.log('✅ AeroPay User Verified:', response))
+    return from(this.httpPost('https://api.aeropay.com/confirmUser', { userId, code }, this.getMerchantToken() || '')).pipe(
+      tap(response => console.log(response))
     );
   }
 
   getAerosyncCredentials(): Observable<any> {
-    return from(this.httpGet('https://staging-api.aeropay.com/aggregatorCredentials?aggregator=aerosync', this.getUsedForMerchantToken() || '')).pipe(
-      tap(response => console.log('✅ Aerosync Credentials Retrieved:', response))
+    return from(this.httpGet('https://api.aeropay.com/aggregatorCredentials?aggregator=aerosync', this.getUsedForMerchantToken() || '')).pipe(
+      tap(response => console.log(response))
     );
   }
 
@@ -96,8 +105,8 @@ export class AeropayService {
       user_password: userPassword,
       aggregator: 'aerosync'
     };
-    return from(this.httpPost('https://staging-api.aeropay.com/linkAccountFromAggregator', payload, this.getUsedForMerchantToken() || '')).pipe(
-      tap(response => console.log('✅ Bank Account Linked:', response))
+    return from(this.httpPost('https://api.aeropay.com/linkAccountFromAggregator', payload, this.getUsedForMerchantToken() || '')).pipe(
+      tap(response => console.log(response))
     );
   }
 
@@ -105,12 +114,12 @@ export class AeropayService {
     const transactionUUID = uuidv4();
     const payload = {
       amount: amount,
-      merchantId: '1760',
+      merchantId: '1689',
       uuid: transactionUUID,
       bankAccountId: bankAccountId
     };
-    return from(this.httpPost('https://staging-api.aeropay.com/transaction', payload, this.getUsedForMerchantToken() || '')).pipe(
-      tap(response => console.log('✅ AeroPay Transaction Created:', response))
+    return from(this.httpPost('https://api.aeropay.com/transaction', payload, this.getUsedForMerchantToken() || '')).pipe(
+      tap(response => console.log(response))
     );
   }
 

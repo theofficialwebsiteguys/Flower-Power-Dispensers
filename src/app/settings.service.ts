@@ -27,6 +27,22 @@ export class SettingsService {
     });
   }
 
+  
+  private getHeaders(): { [key: string]: string } {
+    const sessionData = localStorage.getItem('sessionData');
+    const token = sessionData ? JSON.parse(sessionData).token : null;
+  
+    if (!token) {
+      console.error('No API key found, user needs to log in.');
+      throw new Error('Unauthorized: No API key found');
+    }
+  
+    return {
+      Authorization: token,
+      'Content-Type': 'application/json',
+    };
+  }
+  
   getDarkModeEnabled = (): boolean =>
     localStorage.getItem(this.DARK_MODE_ENABLED) === 'true' && this.isLoggedIn;
 
@@ -46,8 +62,12 @@ export class SettingsService {
     try {
       const userId = this.authService.getCurrentUser().id;
       const url = `${environment.apiUrl}/notifications/all?userId=${userId}`;
-  
-      const response = await CapacitorHttp.get({ url });
+
+      const response = await CapacitorHttp.get({ 
+        url, 
+        headers: this.getHeaders()
+      });
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching user notifications:', JSON.stringify(error));
@@ -58,13 +78,13 @@ export class SettingsService {
   async markNotificationAsRead(notificationId: number): Promise<any> {
     try {
       const url = `${environment.apiUrl}/notifications/mark-read/${notificationId}`;
-  
+
       const response = await CapacitorHttp.put({
         url,
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.getHeaders(),
         data: {},
       });
-  
+
       return response.data;
     } catch (error) {
       console.error('Error marking notification as read:', JSON.stringify(error));
@@ -75,13 +95,13 @@ export class SettingsService {
   async markAllNotificationsAsRead(userId: number): Promise<any> {
     try {
       const url = `${environment.apiUrl}/notifications/mark-all-read`;
-  
+
       const response = await CapacitorHttp.put({
         url,
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.getHeaders(),
         data: { userId },
       });
-  
+
       return response.data;
     } catch (error) {
       console.error('Error marking all notifications as read:', JSON.stringify(error));
@@ -92,9 +112,12 @@ export class SettingsService {
   async deleteNotification(notificationId: number): Promise<any> {
     try {
       const url = `${environment.apiUrl}/notifications/delete/${notificationId}`;
-  
-      const response = await CapacitorHttp.delete({ url });
-  
+
+      const response = await CapacitorHttp.delete({ 
+        url, 
+        headers: this.getHeaders() 
+      });
+
       return response.data;
     } catch (error) {
       console.error('Error deleting notification:', JSON.stringify(error));
@@ -105,13 +128,13 @@ export class SettingsService {
   async deleteAllNotifications(userId: number): Promise<any> {
     try {
       const url = `${environment.apiUrl}/notifications/delete-all`;
-  
+
       const response = await CapacitorHttp.delete({
         url,
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.getHeaders(),
         data: { userId },
       });
-  
+
       return response.data;
     } catch (error) {
       console.error('Error deleting all notifications:', JSON.stringify(error));
@@ -123,25 +146,19 @@ export class SettingsService {
     this.getDarkModeEnabled()
   );
   isDarkModeEnabled$ = this.isDarkModeEnabled.asObservable();
-  
+
   getCarouselImages(): Observable<{ images: string[] }> {
     const url = `${environment.apiUrl}/notifications/images`;
-    console.log('Fetching images from:', url); // Log the request URL
   
     const options = {
       method: 'GET',
-      url
+      url,
+      headers: { 'x-auth-api-key': environment.db_api_key } // Add headers
     };
   
     return from(CapacitorHttp.request(options)).pipe(
-      map((response: HttpResponse) => {
-        console.log('Response received:', JSON.stringify(response)); // Log the full response
-        return response.data; // Extract the `data` property
-      }),
-      catchError((error) => {
-        console.error('Error fetching carousel images:', error); // Log any error
-        throw error;
-      })
+      map((response: any) => response.data) // Extract the `data` property
     );
   }
+  
 }

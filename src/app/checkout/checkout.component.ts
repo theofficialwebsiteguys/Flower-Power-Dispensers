@@ -161,7 +161,7 @@ export class CheckoutComponent implements OnInit {
       next: (response: any) => {
         this.verificationRequired = false; // Hide verification input
         this.presentToast('Verification successful!', 'success');
-        // Proceed with next stage (e.g., placing an order)
+        this.createAeroPayUser();
       },
       error: (error: any) => {
         console.error('Verification Failed:', error);
@@ -391,8 +391,8 @@ export class CheckoutComponent implements OnInit {
                   this.selectedBankId
                 ).toPromise();
           
-                if (!transactionResponse || !transactionResponse.success) {
-                  console.error('AeroPay Transaction Failed:', transactionResponse);
+                if (!transactionResponse.data || !transactionResponse.data.success) {
+                  console.error('AeroPay Transaction Failed:', transactionResponse.data);
                   this.presentToast('Payment failed. Please try again.', 'danger');
                   this.isLoading = false;
                   await loading.dismiss();
@@ -435,7 +435,7 @@ export class CheckoutComponent implements OnInit {
   async presentToast(message: string, color: string = 'danger') {
     const toast = await this.toastController.create({
       message: message,
-      duration: 5000,
+      duration: 7000,
       color: color,
       position: 'bottom',
     });

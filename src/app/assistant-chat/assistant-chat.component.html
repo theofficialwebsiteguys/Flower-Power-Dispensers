@@ -1,0 +1,59 @@
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- Chat Button -->
+  <ion-fab-button 
+    (click)="toggleChat()" 
+    aria-label="Open chat assistant"
+    [attr.aria-expanded]="chatOpen"
+    [attr.aria-controls]="chatOpen ? 'chat-form' : null">
+    <ion-icon name="chatbubble-ellipses"></ion-icon>
+  </ion-fab-button>
+
+  <!-- Chat Form (Appears from Bubble) -->
+  <div 
+    class="chat-form" 
+    *ngIf="chatOpen" 
+    id="chat-form"
+    role="dialog" 
+    aria-labelledby="chat-title"
+    aria-describedby="chat-description"
+    tabindex="-1">
+    
+    <div class="bubble-arrow"></div> <!-- Bubble Arrow -->
+    
+    <ion-card>
+      <ion-card-header class="chat-header">
+        <ion-card-title id="chat-title">Need Help?</ion-card-title>
+        <ion-button 
+          fill="clear" 
+          color="danger" 
+          size="small" 
+          (click)="toggleChat()"
+          aria-label="Close chat assistant">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <p id="chat-description" class="sr-only">
+          Enter your name, email, and message in the fields below, then press Send.
+        </p>
+
+        <form (ngSubmit)="sendMessage()">
+          <ion-item class="input-item">
+            <ion-input id="name" [(ngModel)]="formData.name" name="name" placeholder="Your Name" required aria-required="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-input id="email" [(ngModel)]="formData.email" name="email" type="email" placeholder="Your Email" required aria-required="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="input-item textarea-item">
+            <ion-textarea id="message" [(ngModel)]="formData.message" name="message" placeholder="Your Message" required aria-required="true"></ion-textarea>
+          </ion-item>
+
+          <ion-button expand="full" type="submit" aria-label="Send message">Send</ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-fab>

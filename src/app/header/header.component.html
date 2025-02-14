@@ -25,7 +25,7 @@
 
       <!-- Cart Button -->
       <ion-button class="action-button cart-button" routerLink="/cart" aria-label="View your shopping cart">
-        <i class="fas fa-cart-shopping" aria-hidden="true"></i>
+        <i class="fas fa-cart-shopping"></i>
         <ion-badge *ngIf="cartItemCount > 0" class="cart-badge" [attr.aria-label]="cartItemCount + ' items in cart'">
           {{ cartItemCount }}
         </ion-badge>
@@ -33,7 +33,7 @@
 
       <!-- Notification Button -->
       <ion-button class="action-button notification-button" (click)="toggleNotifications()" aria-label="View notifications">
-        <i class="fas fa-bell" aria-hidden="true"></i>
+        <i class="fas fa-bell"></i>
         <ion-badge *ngIf="unreadCount > 0" class="notification-badge" [attr.aria-label]="unreadCount + ' unread notifications'">
         </ion-badge>
       </ion-button>

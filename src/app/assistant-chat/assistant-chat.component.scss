@@ -1,0 +1,75 @@
+ion-fab {
+    margin-bottom: 15%;
+  }
+  
+  ion-card {
+    background-color: white;
+  }
+  
+  .chat-form {
+    position: absolute;
+    bottom: 120px; // Positioned higher for accessibility
+    right: -10px; // Slight shift to balance width
+    width: 400px; // Increased width
+    height: 450px; // Increased height
+    border-radius: 15px;
+    z-index: 1000;
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: bottom right;
+    animation: fadeInBubble 0.3s ease-out forwards;
+    padding: 15px;
+  }
+  
+  @keyframes fadeInBubble {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .bubble-arrow {
+    position: absolute;
+    bottom: -14px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 14px solid white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chat-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .input-item {
+    margin-bottom: 25px; // Extra spacing between inputs
+  }
+  
+  .textarea-item {
+    min-height: 160px; // Larger textarea
+    ion-textarea {
+      height: 160px;
+    }
+  }
+  
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+  }
+  

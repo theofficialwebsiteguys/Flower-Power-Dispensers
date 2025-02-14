@@ -148,7 +148,7 @@
             <ion-input [(ngModel)]="verificationCode" placeholder="Verification Code"></ion-input>
             <ion-button (click)="verifyAeroPayUser()">Verify</ion-button>
           </div>
-          <div *ngIf="showBankSelection">
+          <div *ngIf="showBankSelection" class="aeropay-banks">
             <ion-list>
               <ion-item 
                 *ngFor="let bank of userBankAccounts" 

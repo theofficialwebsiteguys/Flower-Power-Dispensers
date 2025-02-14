@@ -97,15 +97,23 @@ export class AppComponent {
   }
 
   onCloseSplash() {
-    // Set a slight delay to allow fade-out animation
     setTimeout(() => {
       this.showSplashScreen = false;
-    }, 100); // Matches the animation duration
-    console.log(
-      'Splash screen closed, showSplashScreen:',
-      this.showSplashScreen
-    );
+  
+      // Move focus to the main content area
+      setTimeout(() => {
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) {
+          mainContent.setAttribute('tabindex', '-1'); // Make it focusable
+          mainContent.focus(); // Move focus
+        }
+      }, 0); // Allow time for DOM update
+  
+    }, 100); // Matches the fade-out animation duration
+  
+    console.log('Splash screen closed, showSplashScreen:', this.showSplashScreen);
   }
+  
 
   async checkGeoLocation() {
     try {

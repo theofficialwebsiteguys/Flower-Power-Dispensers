@@ -12,11 +12,14 @@
     <app-splash-screen (closeSplash)="onCloseSplash()"></app-splash-screen>
   </div>
 
-  <!-- Main Content -->
+
   <ion-router-outlet
-    *ngIf="!showSplashScreen"
-    @fadeIn
-    aria-live="polite"
-    aria-label="Main content area"
-  ></ion-router-outlet>
+  *ngIf="!showSplashScreen"
+  [attr.inert]="showSplashScreen ? true : null"
+  aria-live="polite"
+  aria-label="Main content area"
+  id="main-content"
+></ion-router-outlet>
+
+<app-assistant-chat *ngIf="!showSplashScreen"></app-assistant-chat>
 </ion-app>
