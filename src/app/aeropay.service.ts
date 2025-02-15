@@ -53,9 +53,9 @@ export class AeropayService {
       scope: 'merchant',
       api_key: environment.aeropay_api_key,
       api_secret: environment.aeropay_api_secret,
-      id: '1689',
+      id: environment.aeropay_merchant_id
     };
-    return from(this.httpPost(`https://api.aeropay.com/token`, payload)).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/token`, payload)).pipe(
       tap(response => {
         if (response.data?.token) {
           this.setMerchantToken(response.data.token, response.data.TTL);
@@ -69,10 +69,10 @@ export class AeropayService {
       scope: 'userForMerchant',
       api_key: environment.aeropay_api_key,
       api_secret: environment.aeropay_api_secret,
-      id: '1689',
+      id: environment.aeropay_merchant_id,
       userId: userId
     };
-    return from(this.httpPost(`https://api.aeropay.com/token`, payload)).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/token`, payload)).pipe(
       tap(response => {
         if (response.data?.token) {
           this.setUsedForMerchantToken(response.data.token, response.data.TTL);
@@ -82,19 +82,19 @@ export class AeropayService {
   }
 
   createUser(userData: any): Observable<any> {
-    return from(this.httpPost('https://api.aeropay.com/user', userData, this.getMerchantToken() || '')).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/user`, userData, this.getMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }
 
   verifyUser(userId: string, code: string): Observable<any> {
-    return from(this.httpPost('https://api.aeropay.com/confirmUser', { userId, code }, this.getMerchantToken() || '')).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/confirmUser`, { userId, code }, this.getMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }
 
   getAerosyncCredentials(): Observable<any> {
-    return from(this.httpGet('https://api.aeropay.com/aggregatorCredentials?aggregator=aerosync', this.getUsedForMerchantToken() || '')).pipe(
+    return from(this.httpGet(`${environment.aeropay_url}/aggregatorCredentials?aggregator=aerosync`, this.getUsedForMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }
@@ -105,7 +105,7 @@ export class AeropayService {
       user_password: userPassword,
       aggregator: 'aerosync'
     };
-    return from(this.httpPost('https://api.aeropay.com/linkAccountFromAggregator', payload, this.getUsedForMerchantToken() || '')).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/linkAccountFromAggregator`, payload, this.getUsedForMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }
@@ -114,11 +114,11 @@ export class AeropayService {
     const transactionUUID = uuidv4();
     const payload = {
       amount: amount,
-      merchantId: '1689',
+      id: environment.aeropay_merchant_id,
       uuid: transactionUUID,
       bankAccountId: bankAccountId
     };
-    return from(this.httpPost('https://api.aeropay.com/transaction', payload, this.getUsedForMerchantToken() || '')).pipe(
+    return from(this.httpPost(`${environment.aeropay_url}/transaction`, payload, this.getUsedForMerchantToken() || '')).pipe(
       tap(response => console.log(response))
     );
   }

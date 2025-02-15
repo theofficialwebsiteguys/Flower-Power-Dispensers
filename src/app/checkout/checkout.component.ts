@@ -221,7 +221,7 @@ export class CheckoutComponent implements OnInit {
     let widgetRef = openWidget({
       id: "widget",
       iframeTitle: 'Connect',
-      environment: 'staging', // 'production' for live
+      environment: 'production', // 'production' for live
       token: this.aerosyncToken,
       style: {
         width: '375px',
