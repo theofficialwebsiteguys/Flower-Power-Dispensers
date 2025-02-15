@@ -1,5 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Platform } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
+import { SettingsService } from '../settings.service';
 
 @Component({
   selector: 'app-assistant-chat',
@@ -9,8 +12,9 @@ import { Component, OnInit } from '@angular/core';
 export class AssistantChatComponent {
   chatOpen = false;
   formData = { name: '', email: '', message: '' };
+  isKeyboardOpen = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private platform: Platform, private settingsService: SettingsService) {}
 
   toggleChat() {
     this.chatOpen = !this.chatOpen;
@@ -26,19 +30,36 @@ export class AssistantChatComponent {
     }
   }
 
-  sendMessage() {
-    const emailData = {
-      to: 'support@example.com', // Replace with actual email
-      subject: `New Message from ${this.formData.name}`,
-      text: `Name: ${this.formData.name}\nEmail: ${this.formData.email}\nMessage: ${this.formData.message}`
-    };
-
-    this.http.post('https://your-backend.com/api/send-email', emailData)
-      .subscribe(response => {
-        console.log('Email sent!', response);
-        this.chatOpen = false;
-      }, error => {
-        console.error('Error sending email', error);
-      });
+  async sendMessage() {
+    try {
+      await this.settingsService.sendMessage(
+        this.formData.name,
+        this.formData.email,
+        this.formData.message
+      );
+      this.chatOpen = false;
+      console.log('Message sent successfully!');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   }
+
+  // ✅ Detect Keyboard Open & Close Events
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.isKeyboardOpen = window.innerHeight < this.platform.height();
+    this.adjustChatPosition();
+  }
+
+  adjustChatPosition() {
+    const chatBubble = document.querySelector('.chat-form') as HTMLElement;
+    if (chatBubble) {
+      if (this.isKeyboardOpen) {
+        chatBubble.style.bottom = '50vh'; // Move up when keyboard is open
+      } else {
+        chatBubble.style.bottom = '120px'; // Reset position when keyboard closes
+      }
+    }
+  }
+
 }

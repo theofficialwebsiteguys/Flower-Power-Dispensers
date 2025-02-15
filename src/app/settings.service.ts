@@ -42,7 +42,7 @@ export class SettingsService {
       'Content-Type': 'application/json',
     };
   }
-  
+
   getDarkModeEnabled = (): boolean =>
     localStorage.getItem(this.DARK_MODE_ENABLED) === 'true' && this.isLoggedIn;
 
@@ -159,6 +159,29 @@ export class SettingsService {
     return from(CapacitorHttp.request(options)).pipe(
       map((response: any) => response.data) // Extract the `data` property
     );
+  }
+
+  async sendMessage(name: string, email: string, message: string) {
+    const emailData = {
+      subject: `New Message from ${name}`,
+      message: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
+    };
+
+    const options = {
+      url: `${environment.apiUrl}/businesses/send-email`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: emailData
+    };
+
+    try {
+      const response = await CapacitorHttp.request(options);
+      console.log('Email sent!', response);
+      return response;
+    } catch (error) {
+      console.error('Error sending email', error);
+      throw error;
+    }
   }
   
 }

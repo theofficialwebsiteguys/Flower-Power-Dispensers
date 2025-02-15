@@ -7,19 +7,17 @@ ion-fab {
   }
   
   .chat-form {
-    position: absolute;
-    bottom: 120px; // Positioned higher for accessibility
-    right: -10px; // Slight shift to balance width
-    width: 400px; // Increased width
-    height: 450px; // Increased height
+    position: fixed;
+    bottom: 120px; // Default position
+    right: 10px;
+    width: 90%;
+    max-width: 400px;
+    height: auto;
     border-radius: 15px;
     z-index: 1000;
-    opacity: 0;
-    transform: scale(0.9);
-    transform-origin: bottom right;
-    animation: fadeInBubble 0.3s ease-out forwards;
-    padding: 15px;
+    transition: bottom 0.3s ease-in-out; // ✅ Smooth transition when repositioning
   }
+  
   
   @keyframes fadeInBubble {
     from {
