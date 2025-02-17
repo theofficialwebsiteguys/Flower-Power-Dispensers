@@ -2,6 +2,7 @@ ion-item {
   --padding-start: 24px;
   --padding-end: 24px;
   --border-color: rgba(var(--ion-color-dark-rgb), 0.15);
+  z-index: 0;
 }
 
 .product-title {
