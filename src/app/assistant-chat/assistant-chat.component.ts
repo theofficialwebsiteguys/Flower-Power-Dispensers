@@ -3,6 +3,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../settings.service';
+import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-assistant-chat',
@@ -15,6 +16,19 @@ export class AssistantChatComponent {
   isKeyboardOpen = false;
 
   constructor(private http: HttpClient, private platform: Platform, private settingsService: SettingsService) {}
+
+  async ngOnInit() {
+    // ✅ Use the correct enum value for Keyboard Resize Mode
+    await Keyboard.setResizeMode({ mode: KeyboardResize.None });
+
+    Keyboard.addListener('keyboardDidShow', () => {
+      this.isKeyboardOpen = true;
+    });
+
+    Keyboard.addListener('keyboardDidHide', () => {
+      this.isKeyboardOpen = false;
+    });
+  }
 
   toggleChat() {
     this.chatOpen = !this.chatOpen;
@@ -43,23 +57,4 @@ export class AssistantChatComponent {
       console.error('Failed to send message:', error);
     }
   }
-
-  // ✅ Detect Keyboard Open & Close Events
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.isKeyboardOpen = window.innerHeight < this.platform.height();
-    this.adjustChatPosition();
-  }
-
-  adjustChatPosition() {
-    const chatBubble = document.querySelector('.chat-form') as HTMLElement;
-    if (chatBubble) {
-      if (this.isKeyboardOpen) {
-        chatBubble.style.bottom = '50vh'; // Move up when keyboard is open
-      } else {
-        chatBubble.style.bottom = '120px'; // Reset position when keyboard closes
-      }
-    }
-  }
-
 }
