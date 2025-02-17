@@ -86,6 +86,7 @@ export class RegisterComponent {
         ],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
+        termsAccepted: [false, Validators.requiredTrue],
       },
       {
         validator: this.passwordMatchValidator, 
@@ -124,6 +125,11 @@ export class RegisterComponent {
       this.dobInvalidError = true;
       this.accessibilityService.announce('Please correct the errors in the form.', 'assertive');
       this.loading = false;
+      return;
+    }
+
+    if (!this.registerForm.get('termsAccepted')?.value) {
+      this.error = "You must accept the Terms & Conditions to continue.";
       return;
     }
 

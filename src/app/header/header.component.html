@@ -1,6 +1,6 @@
 <ion-toolbar class="heading-container">
   <ion-buttons slot="start">
-    <ion-button class="action-button" routerLink="/home" aria-label="Go to home page">
+    <ion-button class="action-button" (click)="refreshApp()" aria-label="Go to home page">
       <img
         [src]="darkModeEnabled ? 'assets/logo-dark-mode.png' : 'assets/logo.png'"
         class="logo"

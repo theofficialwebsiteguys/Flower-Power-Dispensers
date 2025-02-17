@@ -25,7 +25,7 @@ $spacing: 16px;
   
    /* Avoid cut-off issues on keyboard appearance */
    @supports (padding-bottom: env(safe-area-inset-bottom)) {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 50px); // Account for keyboard and safe area
+    padding-bottom: calc(env(safe-area-inset-bottom) + 20px); // Account for keyboard and safe area
   }
 
 }
@@ -62,7 +62,6 @@ $spacing: 16px;
 // Logo
 .login-header-logo {
   text-align: center;
-  margin: $spacing auto;
 
   .logo {
     width: 150px; // Slightly larger for emphasis
@@ -243,4 +242,26 @@ $spacing: 16px;
   text-align: center;
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(211, 47, 47, 0.1);
+}
+
+.terms-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.terms-label {
+  font-size: 10px;
+  color: $text-color-dark;
+  line-height: 1.4;
+  font-weight: 500;
+}
+  
+ion-checkbox {
+  --background: var(--ion-color-light);
+  --border-radius: 4px;
+  --size: 20px;
+  --checkmark-color: var(--ion-color-light);
+  --border-color: var(--ion-color-medium);
 }

@@ -197,9 +197,7 @@ export class CartService {
   
     const getUserInfo = async () => {
       user_info = await this.authService.getCurrentUser();
-      console.log(user_info)
     };
-    
   
     const createOrder = async () => {
       const orderDetails = {

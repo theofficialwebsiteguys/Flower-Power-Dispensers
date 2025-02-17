@@ -69,7 +69,9 @@ export class HeaderComponent {
   }
   
   
-  
+  refreshApp() {
+    window.location.reload();
+  }
   
 
   async markAllNotificationsAsRead() {

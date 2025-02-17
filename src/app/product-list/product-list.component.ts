@@ -15,6 +15,7 @@ import { AccessibilityService } from '../accessibility.service';
 export class ProductListComponent implements OnInit {
 
   @Input() showSimilarItems: boolean = false;
+  @Input() searchQuery: string = '';
 
   constructor(private productService: ProductsService, private accessibilityService: AccessibilityService) {}
 
@@ -37,6 +38,10 @@ export class ProductListComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (changes['searchQuery']) {
+      this.updateProducts();
+    }
+
     if (changes['showSimilarItems']) {
       this.updateProducts();
       const message = this.showSimilarItems ? 'Displaying similar items.' : 'Displaying filtered products.';
@@ -48,7 +53,17 @@ export class ProductListComponent implements OnInit {
     if (this.showSimilarItems) {
       this.products$ = this.productService.getSimilarItems().pipe(startWith([]));
     } else {
-      this.products$ = this.productService.getFilteredProducts().pipe(startWith([]));
+      this.products$ = this.productService.getFilteredProducts(this.searchQuery).pipe(startWith([]));
     }
+  }
+
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery = target.value.trim();
+    this.updateProducts();
+  }
+
+  isCategoryVisible(category: string): boolean {
+    return this.searchQuery.trim() !== '' || category === this.currentCategory;
   }
 }

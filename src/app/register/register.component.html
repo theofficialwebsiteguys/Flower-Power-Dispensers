@@ -209,6 +209,29 @@
         </div>
       </div>
 
+      <div class="form-group terms-group">
+        <ion-checkbox
+          id="termsAccepted"
+          formControlName="termsAccepted"
+          aria-required="true"
+          aria-describedby="terms-error"
+        ></ion-checkbox>
+        <label for="termsAccepted" class="terms-label">
+          I acknowledge that my personal data, including location, may be used to personalize offers, promotions, and notifications. My data will not be sold and will be handled in compliance with applicable privacy laws.
+        </label>
+      </div>
+      
+      <!-- Show an error message if they try to submit without checking -->
+      <div 
+        *ngIf="submitted && registerForm.get('termsAccepted')?.invalid" 
+        class="form-error" 
+        id="terms-error" 
+        aria-live="assertive"
+      >
+        You must acknowledge the privacy policy to proceed.
+      </div>
+      
+
       <ion-button
         expand="block"
         type="submit"

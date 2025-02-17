@@ -92,7 +92,98 @@ export class ProductsService {
     return products.sort((a, b) => a.title.localeCompare(b.title));
   }  
 
-  getFilteredProducts(): Observable<Product[]> {
+  // getFilteredProducts(): Observable<Product[]> {
+  //   return this.products$.pipe(
+  //     filter((productArray) => productArray.length > 0),
+  //     map((productArray) => {
+  //       const {
+  //         sortMethod: { criterion, direction },
+  //       } = this.currentProductFilters.getValue();
+
+  
+  //       return productArray
+  //         .filter(({ category, brand, strainType, weight, thc }) => {
+  //           const {
+  //             brands,
+  //             strains,
+  //             weights,
+  //             potency: { thc: thcRange },
+  //           } = this.currentProductFilters.getValue();
+  
+  //           const isEmpty = (arr: any) => {
+  //             return arr.length < 1;
+  //           };
+  
+  //           const isInRange = (value: number, range: PotencyRange): boolean => {
+  //             const { lower, upper } = range;
+  //             return value >= lower && value <= upper;
+  //           };
+  
+  //           // Default THC to 100 if null or undefined
+  //           const defaultThc = thc ?? '100% THC';
+  
+  //           return (
+  //             category === this.currentCategory.value &&
+  //             (isEmpty(brands) || brands.includes(brand)) &&
+  //             (!strainType ||
+  //               isEmpty(strains) ||
+  //               strains.some((s) =>
+  //                 strainType.toUpperCase().split(' ').includes(s)
+  //               )) &&
+  //             (!weight || isEmpty(weights) || weights.includes(weight)) &&
+  //             (!defaultThc || isInRange(Number(defaultThc.split('%')[0]), thcRange))
+  //           );
+  //         })
+  //         .sort(
+  //           (
+  //             { price: priceA, thc: thcA, title: titleA },
+  //             { price: priceB, thc: thcB, title: titleB }
+  //           ) => {
+  //             let result = 0;
+  
+  //             // Default THC to 100 if null or undefined for sorting
+  //             const defaultThcA = thcA ?? '100';
+  //             const defaultThcB = thcB ?? '100';
+  
+  //             switch (criterion) {
+  //               case 'POPULAR': {
+  //                 break;
+  //               }
+  //               case 'PRICE': {
+  //                 if (direction === 'ASC')
+  //                   result = Number(priceA) - Number(priceB);
+  //                 else if (direction === 'DESC')
+  //                   result = Number(priceB) - Number(priceA);
+  //                 break;
+  //               }
+  //               case 'THC': {
+  //                 if (direction === 'ASC')
+  //                   result = Number(defaultThcA) - Number(defaultThcB);
+  //                 else if (direction === 'DESC')
+  //                   result = Number(defaultThcB) - Number(defaultThcA);
+  //                 break;
+  //               }
+  //               case 'ALPHABETICAL': {
+  //                 if (direction === 'ASC')
+  //                   result = titleA.localeCompare(titleB);
+  //                 else if (direction === 'DESC')
+  //                   result = titleB.localeCompare(titleA);
+  //                 break;
+  //               }
+  //               default: {
+  //                 break;
+  //               }
+  //             }
+  
+  //             return result;
+  //           }
+  //         );
+  //     }),
+  //     filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
+  //   );
+  // }
+
+  getFilteredProducts(searchQuery: string = ''): Observable<Product[]> {
     return this.products$.pipe(
       filter((productArray) => productArray.length > 0),
       map((productArray) => {
@@ -102,7 +193,7 @@ export class ProductsService {
 
   
         return productArray
-          .filter(({ category, brand, strainType, weight, thc }) => {
+          .filter(({ category, title, brand, strainType, weight, thc }) => {
             const {
               brands,
               strains,
@@ -121,9 +212,15 @@ export class ProductsService {
   
             // Default THC to 100 if null or undefined
             const defaultThc = thc ?? '100% THC';
+
+            const isMatchingSearch = searchQuery.trim() === '' || title.toLowerCase().includes(searchQuery.toLowerCase());
+
+            const isMatchingCategory =
+                searchQuery.trim() !== '' || category === this.currentCategory.value;
   
             return (
-              category === this.currentCategory.value &&
+              isMatchingSearch && 
+              isMatchingCategory &&
               (isEmpty(brands) || brands.includes(brand)) &&
               (!strainType ||
                 isEmpty(strains) ||
@@ -182,6 +279,7 @@ export class ProductsService {
       filter((filteredProducts) => filteredProducts.length > 0) // ✅ Ensure it only emits if there are filtered products
     );
   }
+  
   
 
   getProductFilterOptions(): Observable<ProductFilterOptions> {

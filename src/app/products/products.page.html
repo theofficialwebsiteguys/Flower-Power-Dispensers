@@ -1,9 +1,19 @@
 <ion-content aria-label="Product browsing page">
   <app-header aria-label="Website header with navigation"></app-header>
 
+  <ion-searchbar
+    [(ngModel)]="searchQuery"
+    (ionInput)="onSearch($event)"
+    placeholder="Search products..."
+    debounce="300"
+    showClearButton="always"
+    animated
+    aria-label="Search products"
+  ></ion-searchbar>
+
   <app-product-categories aria-label="Product categories section"></app-product-categories>
 
   <app-product-filters aria-label="Product filtering options"></app-product-filters>
 
-  <app-product-list aria-label="Product list section"></app-product-list>
+  <app-product-list [searchQuery]="searchQuery" aria-label="Product list section"></app-product-list>
 </ion-content>

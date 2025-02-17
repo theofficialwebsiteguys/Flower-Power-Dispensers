@@ -9,6 +9,8 @@ import { IonContent } from '@ionic/angular';
 export class ProductsPage implements OnInit {
   @ViewChild(IonContent, { static: false }) content!: IonContent;
 
+  searchQuery: string = '';
+
   constructor() {}
 
   ngOnInit() {}
@@ -23,5 +25,10 @@ export class ProductsPage implements OnInit {
     } else {
       console.warn('IonContent is not available.');
     }
+  }
+
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery = target.value.trim().toLowerCase();
   }
 }
