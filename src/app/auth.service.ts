@@ -299,10 +299,9 @@ export class AuthService {
   }
 
   get orders() {
-    return this.enrichedOrders.asObservable().pipe(
-      filter((orders) => orders && orders.length > 0) // Only emit when orders exist
-    );
+    return this.enrichedOrders.asObservable(); // ✅ Always emits, even if empty
   }
+  
 
 
   handleRecentOrders(orders: any[]) {
