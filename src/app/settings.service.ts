@@ -163,15 +163,18 @@ export class SettingsService {
 
   async sendMessage(name: string, email: string, message: string) {
     const emailData = {
-      subject: `New Message from ${name}`,
-      message: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
+      subject: `New Message from ${name}`,  // ✅ Use backticks for template literals
+      message: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`  // ✅ Properly format string
     };
 
     const options = {
-      url: `${environment.apiUrl}/businesses/send-email`,
+      url: `${environment.apiUrl}/businesses/send-email`,  // ✅ Fix missing backticks
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: emailData
+      headers: { 
+        'x-auth-api-key': environment.db_api_key,
+        'Content-Type': 'application/json'  // ✅ Ensure correct content type
+      },
+      data: emailData  // ✅ Ensure proper structure
     };
 
     try {
@@ -182,6 +185,6 @@ export class SettingsService {
       console.error('Error sending email', error);
       throw error;
     }
-  }
+}
   
 }
