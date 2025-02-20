@@ -165,35 +165,36 @@ export class CartService {
 
   checkout(points_redeem: number, orderType: string, deliveryAddress: any) {
     const cartItems = this.getCart();
-    const unmatchedItems = [...cartItems];
-    const matchedCart: any[] = [];
-    let skip = 0;
-    const take = 5000;
+    // const unmatchedItems = [...cartItems];
+    // const matchedCart: any[] = [];
+    // let skip = 0;
+    // const take = 5000;
     let id_order = 0;
     let subtotal = 0;
     let user_info: any;
-    let checkoutItems: any[] = [];
+    // let checkoutItems: any[] = [];
+    const checkoutItems = [...cartItems];
   
-    const fetchAndMatch = async (): Promise<any[]> => {
-      while (unmatchedItems.length > 0) {
-        const inventoryResponse = await this.fetchInventory(skip, take);
-        inventoryResponse.forEach((inventoryItem: any) => {
-          const matchIndex = unmatchedItems.findIndex(
-            (cartItem) => +cartItem.posProductId === inventoryItem.id_item
-          );
-          if (matchIndex !== -1) {
-            matchedCart.push({
-              ...unmatchedItems[matchIndex],
-              id_batch: inventoryItem.id_batch,
-            });
-            unmatchedItems.splice(matchIndex, 1);
-          }
-        });
-        skip += take;
-        if (inventoryResponse.length === 0) break;
-      }
-      return matchedCart;
-    };
+    // const fetchAndMatch = async (): Promise<any[]> => {
+    //   while (unmatchedItems.length > 0) {
+    //     const inventoryResponse = await this.fetchInventory(skip, take);
+    //     inventoryResponse.forEach((inventoryItem: any) => {
+    //       const matchIndex = unmatchedItems.findIndex(
+    //         (cartItem) => +cartItem.posProductId === inventoryItem.id_item
+    //       );
+    //       if (matchIndex !== -1) {
+    //         matchedCart.push({
+    //           ...unmatchedItems[matchIndex],
+    //           id_batch: inventoryItem.id_batch,
+    //         });
+    //         unmatchedItems.splice(matchIndex, 1);
+    //       }
+    //     });
+    //     skip += take;
+    //     if (inventoryResponse.length === 0) break;
+    //   }
+    //   return matchedCart;
+    // };
   
     const getUserInfo = async () => {
       user_info = await this.authService.getCurrentUser();
@@ -225,13 +226,13 @@ export class CartService {
   
     const updateOrderItemPrices = async () => {
       let remainingDiscount = points_redeem / 20;
-      const sortedItems = [...checkoutItems].sort((a, b) => b.price - a.price);
+      const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
       for (const item of sortedItems) {
         if (remainingDiscount <= 0) break;
-        const discountAmount = Math.min(item.price, remainingDiscount);
+        const discountAmount = Math.min(Number(item.price), remainingDiscount);
         remainingDiscount -= discountAmount;
-        const priceOverride = item.price - discountAmount;
-        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+        const priceOverride = Number(item.price) - discountAmount;
+        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.posProductId}`;
         const headers = {
           Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
           'Content-Type': 'application/json; charset=utf-8',
@@ -253,7 +254,6 @@ export class CartService {
     return (async () => {
       try {
         await getUserInfo();
-        checkoutItems = await fetchAndMatch();
         await createOrder();
         await addItemsToOrder();
         await updateOrderItemPrices();
