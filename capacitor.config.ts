@@ -6,8 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     hostname: "com.flowerpowerdispensers.app",
-    androidScheme: "https",
-    allowNavigation: ["pay.aero.inc"]
+    androidScheme: "flowerPower",
+    iosScheme: "flowerPower"
   },
   plugins: {
     CapacitorHttp: {
@@ -21,6 +21,10 @@ const config: CapacitorConfig = {
     },
     FirebaseMessaging: {
       presentationOptions: ["badge", "sound", "alert"]
+    },
+    DeepLinks: {
+      schemes: ["flowerPower"],
+      hosts: ["dispensary-api-ac9613fa4c11.herokuapp.com"]
     }
   },
 };
