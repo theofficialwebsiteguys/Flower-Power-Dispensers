@@ -27,6 +27,14 @@ export class CardSliderComponent implements OnInit {
     });
   }
 
+  getLimitedProducts(category: string) {
+    return this.products.filter(product => product.category === category).slice(0, 9);
+  }
+
+  getTotalProducts(category: string) {
+    return this.products.filter(product => product.category === category).length;
+  }
+
   updateCategory(category?: ProductCategory) {
     if (category) {
       this.productService.updateCategory(category);

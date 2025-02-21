@@ -25,6 +25,7 @@
           <input
             type="text"
             id="firstName"
+            autocomplete="given-name"
             formControlName="firstName"
             [class.invalid]="
               submitted && registerForm.get('firstName')?.invalid
@@ -47,6 +48,7 @@
             type="text"
             id="lastName"
             formControlName="lastName"
+            autocomplete="family-name"
             [class.invalid]="submitted && registerForm.get('lastName')?.invalid"
             placeholder="Enter your last name"
             required
@@ -70,6 +72,8 @@
           [class.invalid]="submitted && registerForm.get('email')?.invalid"
           placeholder="Enter your email"
           required
+          inputmode="email"
+          autocomplete="email"
           [attr.aria-invalid]="submitted && registerForm.get('email')?.invalid"
         />
         <div
@@ -104,6 +108,7 @@
             type="tel"
             id="phone"
             formControlName="phone"
+            autocomplete="tel"
             [class.invalid]="submitted && registerForm.get('phone')?.invalid"
             placeholder="Enter your phone number"
             required
@@ -126,6 +131,7 @@
             type="tel"
             id="month"
             formControlName="month"
+            autocomplete="bday"
             [class.invalid]="submitted && registerForm.get('month')?.invalid"
             placeholder="MM"
             class="dob-input"

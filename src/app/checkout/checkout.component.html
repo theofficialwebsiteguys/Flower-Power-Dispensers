@@ -77,6 +77,7 @@
       <ion-item class="rounded-input">
         <ion-input
           [(ngModel)]="deliveryAddress.street"
+          autocomplete="address-line1"
           name="street"
           placeholder="Street Address"
           aria-label="Street Address"
@@ -86,6 +87,7 @@
       <ion-item class="rounded-input">
         <ion-input
           [(ngModel)]="deliveryAddress.apt"
+          autocomplete="address-line2"
           name="apt"
           placeholder="Apartment / Suite (Optional)"
           aria-label="Apartment or Suite"
@@ -96,6 +98,7 @@
         <ion-item class="rounded-input half-width">
           <ion-input
             [(ngModel)]="deliveryAddress.city"
+            autocomplete="address-level2"
             name="city"
             placeholder="City"
             aria-label="City"
@@ -104,6 +107,7 @@
         <ion-item class="rounded-input half-width">
           <ion-input
             [(ngModel)]="deliveryAddress.zip"
+            autocomplete="postal-code"
             name="zip"
             placeholder="ZIP Code"
             aria-label="ZIP Code"

@@ -10,10 +10,12 @@
     <div *ngIf="loading" class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
     </div>
+
+    <!-- Scrollable Product Slider -->
     <div class="slider-container" tabindex="0" [attr.aria-label]="'Product slider for ' + category.category">
       <div class="slider">
-        <ng-container *ngFor="let product of products">
-          <div class="slide" *ngIf="product.category === category.category">
+        <ng-container *ngFor="let product of getLimitedProducts(category.category)">
+          <div class="slide">
             <div class="card" (click)="updateProductDisplay(product)" role="button"
               [attr.aria-label]="'View details for ' + product.title">
               <div class="image-container">
@@ -28,6 +30,14 @@
             </div>
           </div>
         </ng-container>
+
+        <!-- View More Button (Placed Inline) -->
+        <div *ngIf="getTotalProducts(category.category) > 8" class="slide view-more-slide">
+          <button class="view-more-button" (click)="updateCategory(category.category)">
+            View More
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.flowerpowerdispensers.application',
+  appId: 'com.flowerpowerdispensers.app',
   appName: 'Flower Power Dispensers',
   webDir: 'www',
   server: {
