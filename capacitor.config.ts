@@ -6,8 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     hostname: "com.flowerpowerdispensers.app",
-    androidScheme: "flowerPower",
-    iosScheme: "flowerPower"
+    androidScheme: "https",
+    allowNavigation: ["pay.aero.inc"]
   },
   plugins: {
     CapacitorHttp: {
