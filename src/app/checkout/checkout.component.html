@@ -61,7 +61,7 @@
         <ion-label>Pickup</ion-label>
       </ion-item>
       <ion-item lines="none" class="radio-item">
-        <ion-radio slot="start" value="delivery" [disabled]="!enableDelivery"></ion-radio>
+        <ion-radio slot="start" value="delivery" [disabled]="!enableDelivery || finalTotal < 90"></ion-radio>
         <ion-label>Delivery</ion-label>
       </ion-item>
     </ion-radio-group>

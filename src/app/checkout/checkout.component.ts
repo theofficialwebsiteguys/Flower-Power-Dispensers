@@ -5,6 +5,7 @@ import { AccessibilityService } from '../accessibility.service';
 import { AuthService } from '../auth.service';
 import { AeropayService } from '../aeropay.service';
 import { openWidget } from 'aerosync-web-sdk';
+import { SettingsService } from '../settings.service';
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
@@ -78,12 +79,27 @@ export class CheckoutComponent implements OnInit {
     private accessibilityService: AccessibilityService,
     private toastController: ToastController,
     private authService: AuthService,
-    private aeropayService: AeropayService
+    private aeropayService: AeropayService,
+    private settingsService: SettingsService
   ) {}
 
   ngOnInit() {
     this.calculateDefaultTotals();
     this.generateTimeOptions();
+    this.checkDeliveryEligibility();
+  }
+  
+  checkDeliveryEligibility() {
+    this.settingsService.checkDeliveryEligibility().subscribe({
+      next: (response) => {
+        this.enableDelivery = response.deliveryAvailable;
+        console.log('Delivery availability:', this.enableDelivery);
+      },
+      error: (error) => {
+        console.error('Error fetching delivery eligibility:', error);
+        this.enableDelivery = false; // Fallback if the request fails
+      }
+    });
   }
 
   async startAeroPayProcess() {
@@ -312,9 +328,9 @@ export class CheckoutComponent implements OnInit {
     if (this.finalSubtotal < 0) this.finalSubtotal = 0;
     this.finalTax = this.finalSubtotal * 0.13;
     this.finalTotal = this.finalSubtotal + this.finalTax;
-    if(this.finalTotal >= 90){
-      this.enableDelivery = true;
-    }
+    // if(this.finalTotal >= 90 ){
+    //   this.enableDelivery = true;
+    // }
 
     this.accessibilityService.announce(
       `Subtotal updated to ${this.finalSubtotal.toFixed(2)} dollars.`,

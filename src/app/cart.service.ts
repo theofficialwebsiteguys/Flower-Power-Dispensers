@@ -548,58 +548,56 @@ export class CartService {
         });
     }
 
-  async addCheckoutItemsToOrder(idOrder: number, checkoutItems: any[]) {
-    const headers = {
-      Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
-      'Content-Type': 'application/json; charset=utf-8',
-      Accept: 'application/json; charset=utf-8',
-    };
-  
-    const apiUrl = `https://app.alleaves.com/api/order/${idOrder}/item`;
-  
-    const addItemRequests = checkoutItems.map((item) => {
-      const body = {
-        id_batch: item.id_batch,
-        id_area: 1000,
-        qty: item.quantity,
+    async addCheckoutItemsToOrder(idOrder: number, checkoutItems: any[]) {
+      const headers = {
+        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+        'Content-Type': 'application/json; charset=utf-8',
+        Accept: 'application/json; charset=utf-8',
       };
+    
+      const apiUrl = `https://app.alleaves.com/api/order/${idOrder}/item`;
   
-      const options = {
-        url: apiUrl,
-        method: 'POST',
-        headers: headers,
-        data: body,
-      };
+      const addedItems: any[] = [];
   
-      return CapacitorHttp.request(options)
-        .then((response) => {
-          const generatedItems = response.data.items.map((resItem: any) => ({
-            ...item,
-            id_item: resItem.id_item,
-          }));
-          return generatedItems;
-        })
-        .catch((error) => {
+      for (const item of checkoutItems) {
+        const body = {
+          id_batch: item.id_batch,
+          id_area: 1000,
+          qty: item.quantity,
+        };
+  
+        const options = {
+          url: apiUrl,
+          method: 'POST',
+          headers: headers,
+          data: body,
+        };
+  
+        try {
+          const response = await CapacitorHttp.request(options);
+  
+          if (response?.data?.items) {
+            const generatedItems = response.data.items.map((resItem: any) => ({
+              ...item,
+              id_item: resItem.id_item,
+            }));
+            addedItems.push(...generatedItems);
+          } else {
+            console.warn(`Unexpected response format for item ${item.id_batch}:`, response);
+          }
+        } catch (error) {
           console.error(`Error adding item (id_batch: ${item.id_batch}):`, error);
-          throw error;
-        });
-    });
+          continue; // Continue with the next item instead of stopping all requests
+        }
+      }
   
-    return Promise.all(addItemRequests)
-      .then((responses) => {
-        return responses.flat();
-      })
-      .catch((error) => {
-        console.error('Error processing items:', error);
-        throw error;
-      });
+      return addedItems;
   }
   
 
   async placeOrder(user_id: number, pos_order_id: number, points_add: number, points_redeem: number, amount: number, cart: any) {
     const payload = { user_id, pos_order_id, points_add, points_redeem, amount, cart };
   
-    console.log(payload);
   
     const sessionData = localStorage.getItem('sessionData');
     const token = sessionData ? JSON.parse(sessionData).token : null;

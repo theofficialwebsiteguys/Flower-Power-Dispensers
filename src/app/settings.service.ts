@@ -186,5 +186,18 @@ export class SettingsService {
       throw error;
     }
 }
+
+  checkDeliveryEligibility(): Observable<{ deliveryAvailable: boolean }> {
+    const options = {
+      url: `${environment.apiUrl}/businesses/delivery-eligibility`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    };
+
+    // Convert CapacitorHttp request to Observable
+    return from(CapacitorHttp.request(options).then(response => response.data));
+  }
   
 }

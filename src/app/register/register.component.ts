@@ -122,7 +122,6 @@ export class RegisterComponent {
     this.submitted = true;
 
     if (this.registerForm.invalid) {
-      this.dobInvalidError = true;
       this.accessibilityService.announce('Please correct the errors in the form.', 'assertive');
       this.loading = false;
       return;
