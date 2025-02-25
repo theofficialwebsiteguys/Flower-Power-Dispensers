@@ -191,13 +191,13 @@ export class SettingsService {
     const options = {
       url: `${environment.apiUrl}/businesses/delivery-eligibility`,
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
+      headers: this.getHeaders()
     };
 
     // Convert CapacitorHttp request to Observable
     return from(CapacitorHttp.request(options).then(response => response.data));
   }
+
+
   
 }

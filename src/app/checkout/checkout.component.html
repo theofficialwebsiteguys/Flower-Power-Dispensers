@@ -66,8 +66,11 @@
       </ion-item>
     </ion-radio-group>
     
-    <!-- Conditional message when Delivery is disabled -->
+    <!-- Conditional message for Delivery -->
     <p *ngIf="!enableDelivery" class="delivery-warning">
+      Delivery is currently turned off.
+    </p>
+    <p *ngIf="enableDelivery && finalTotal < 90" class="delivery-warning">
       Orders must be at least $90 for delivery.
     </p>
     
