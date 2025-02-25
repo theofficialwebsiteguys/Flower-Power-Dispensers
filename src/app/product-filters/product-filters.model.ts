@@ -1,6 +1,6 @@
 import { Strain } from '../product/product.model';
 
-export type SortCriterion = 'POPULAR' | 'PRICE' | 'THC' | 'ALPHABETICAL';
+export type SortCriterion = 'RECENT' | 'PRICE' | 'THC' | 'ALPHABETICAL';
 export type CriteriaOptions = {
   label: string;
   value: SortCriterion;
@@ -38,7 +38,7 @@ export type ProductFilterOptions = {
 };
 
 export const DEFAULT_PRODUCT_FILTERS: ProductFilters = {
-  sortMethod: { criterion: 'POPULAR', direction: 'DESC' },
+  sortMethod: { criterion: 'ALPHABETICAL', direction: 'ASC' },
   brands: [],
   strains: [],
   weights: [],
@@ -46,7 +46,7 @@ export const DEFAULT_PRODUCT_FILTERS: ProductFilters = {
 };
 
 export const OPTIONS_CRITERIA: CriteriaOptions = [
-  { label: 'Popular', value: 'POPULAR' },
+  { label: 'Recently Added', value: 'RECENT' },
   { label: 'Price', value: 'PRICE' },
   { label: 'THC', value: 'THC' },
   { label: 'A-Z', value: 'ALPHABETICAL' },

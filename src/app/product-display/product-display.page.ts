@@ -15,7 +15,7 @@ export class ProductDisplayPage implements OnInit {
   ngOnInit() {
     this.productService.updateProductFilters({
       ...DEFAULT_PRODUCT_FILTERS,
-      sortMethod: { criterion: 'POPULAR', direction: 'DESC' },
+      sortMethod: { criterion: 'RECENT', direction: 'DESC' },
     });
   }
 }
