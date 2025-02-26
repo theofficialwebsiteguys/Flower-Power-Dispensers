@@ -556,44 +556,47 @@ export class CartService {
       };
     
       const apiUrl = `https://app.alleaves.com/api/order/${idOrder}/item`;
-  
       const addedItems: any[] = [];
-  
+    
       for (const item of checkoutItems) {
         const body = {
           id_batch: item.id_batch,
           id_area: 1000,
           qty: item.quantity,
         };
-  
+    
         const options = {
           url: apiUrl,
           method: 'POST',
           headers: headers,
           data: body,
         };
-  
+    
         try {
           const response = await CapacitorHttp.request(options);
-  
-          if (response?.data?.items) {
-            const generatedItems = response.data.items.map((resItem: any) => ({
-              ...item,
-              id_item: resItem.id_item,
-            }));
-            addedItems.push(...generatedItems);
+    
+          if (response?.data?.items?.length > 0) {
+            // Only push unique items based on `id_item`
+            response.data.items.forEach((resItem: any) => {
+              const exists = addedItems.some((added) => added.id_item === resItem.id_item);
+              if (!exists) {
+                addedItems.push({
+                  ...item,
+                  id_item: resItem.id_item,
+                });
+              }
+            });
           } else {
             console.warn(`Unexpected response format for item ${item.id_batch}:`, response);
           }
         } catch (error) {
           console.error(`Error adding item (id_batch: ${item.id_batch}):`, error);
-          continue; // Continue with the next item instead of stopping all requests
+          continue;
         }
       }
-  
+    
       return addedItems;
-  }
-  
+    }
 
   async placeOrder(user_id: number, pos_order_id: number, points_add: number, points_redeem: number, amount: number, cart: any) {
     const payload = { user_id, pos_order_id, points_add, points_redeem, amount, cart };
