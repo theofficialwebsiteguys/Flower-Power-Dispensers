@@ -90,6 +90,7 @@ async sendStatusNotification(userId: number, statusMessage: string) {
       const cartItem: CartItem = {
         id: item.id,
         posProductId: item.posProductId,
+        id_batch: item.id_batch,
         image: item.image,
         brand: item.brand,
         desc: item.desc,

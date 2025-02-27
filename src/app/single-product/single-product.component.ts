@@ -19,6 +19,7 @@ export class SingleProductComponent implements OnInit {
   currentProduct: Product = {
     id: '',
     posProductId: '',
+    id_batch: '',
     category: 'FLOWER',
     title: '',
     brand: '',

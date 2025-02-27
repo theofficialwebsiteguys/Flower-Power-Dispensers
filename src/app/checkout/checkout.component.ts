@@ -427,16 +427,16 @@ export class CheckoutComponent implements OnInit {
   
       const response = await this.cartService.checkout(points_redeem, this.selectedOrderType, deliveryAddress);
   
-      pos_order_id = response.id_order;
-      points_add = response.subtotal;
+      // pos_order_id = response.id_order;
+      // points_add = response.subtotal;
 
-      await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
+      // await this.cartService.placeOrder(user_id, pos_order_id, points_redeem ? 0 : points_add, points_redeem, this.finalSubtotal, this.checkoutInfo.cart);
   
-      this.orderPlaced.emit();
+      // this.orderPlaced.emit();
 
-      const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
+      // const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
       
-      this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
+      // this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
     } catch (error:any) {
       console.error('Error placing order:', error);
       await this.presentToast('Error placing order: ' + JSON.stringify(error.message));

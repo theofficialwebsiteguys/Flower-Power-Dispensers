@@ -6,6 +6,7 @@ export type Product = {
   [key: string]: any;
   id: string;
   posProductId: string;
+  id_batch: string;
   category: ProductCategory; // .cannabisComplianceType OR .cannabisType
   title: string; // .name
   desc: string; // .description

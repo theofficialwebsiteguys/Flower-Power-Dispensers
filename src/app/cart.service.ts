@@ -8,6 +8,7 @@ import { CapacitorHttp } from '@capacitor/core';
 export interface CartItem {
   id: string;
   posProductId: string;
+  id_batch: string;
   image: string;
   brand: string;
   desc: string;
@@ -549,6 +550,7 @@ export class CartService {
     }
 
     async addCheckoutItemsToOrder(idOrder: number, checkoutItems: any[]) {
+      console.log(checkoutItems)
       const headers = {
         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
         'Content-Type': 'application/json; charset=utf-8',
@@ -559,6 +561,7 @@ export class CartService {
       const addedItems: any[] = [];
     
       for (const item of checkoutItems) {
+        console.log(item)
         const body = {
           id_batch: item.id_batch,
           id_area: 1000,
