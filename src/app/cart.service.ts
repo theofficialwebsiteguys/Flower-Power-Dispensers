@@ -19,6 +19,7 @@ export interface CartItem {
   thc: string;
   weight: string;
   category: string;
+  id_item?: string;
 }
 
 @Injectable({
@@ -174,7 +175,7 @@ export class CartService {
     let subtotal = 0;
     let user_info: any;
     // let checkoutItems: any[] = [];
-    const checkoutItems = [...cartItems];
+    let checkoutItems = [...cartItems];
   
     // const fetchAndMatch = async (): Promise<any[]> => {
     //   while (unmatchedItems.length > 0) {
@@ -222,6 +223,10 @@ export class CartService {
   
     const addItemsToOrder = async () => {
       const responses = await this.addCheckoutItemsToOrder(id_order, checkoutItems);
+      checkoutItems = checkoutItems.map((cartItem, index) => ({
+        ...cartItem,
+        id_item: responses[index]?.id_item, // Assign the correct id_item
+      }));
       subtotal = responses.reduce((acc: number, item: any) => acc + (item.price || 0), 0);
     };
   
@@ -233,7 +238,7 @@ export class CartService {
         const discountAmount = Math.min(Number(item.price), remainingDiscount);
         remainingDiscount -= discountAmount;
         const priceOverride = Number(item.price) - discountAmount;
-        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.posProductId}`;
+        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
         const headers = {
           Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
           'Content-Type': 'application/json; charset=utf-8',
