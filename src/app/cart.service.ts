@@ -220,20 +220,37 @@ export class CartService {
       const response = await this.createOrder(orderDetails);
       id_order = response.id_order;
     };
-  
+
     const addItemsToOrder = async () => {
       const responses = await this.addCheckoutItemsToOrder(id_order, checkoutItems);
-      checkoutItems = checkoutItems.map((cartItem, index) => ({
-        ...cartItem,
-        id_item: responses[index]?.id_item, // Assign the correct id_item
-      }));
-      subtotal = responses.reduce((acc: number, item: any) => acc + (item.price || 0), 0);
+  
+      let responseIndex = 0;
+    
+      // Assign each response ID to the correct checkout item, considering quantity
+      checkoutItems = checkoutItems.flatMap((cartItem) => {
+        const newItems = [];
+        for (let i = 0; i < cartItem.quantity; i++) {
+          if (responses[responseIndex]) {
+            newItems.push({
+              ...cartItem,
+              id_item: responses[responseIndex].id_item, // Assign unique id_item
+            });
+            responseIndex++; // Move to next response item
+          }
+        }
+        return newItems;
+      });
+    
+      // Recalculate subtotal
+      subtotal = checkoutItems.reduce((acc: number, item: any) => acc + (item.price || 0), 0);
     };
   
     const updateOrderItemPrices = async () => {
       let remainingDiscount = points_redeem / 20;
       const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
       for (const item of sortedItems) {
+        console.log(item)
+        console.log(remainingDiscount)
         if (remainingDiscount <= 0) break;
         const discountAmount = Math.min(Number(item.price), remainingDiscount);
         remainingDiscount -= discountAmount;

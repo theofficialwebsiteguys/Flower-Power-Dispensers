@@ -30,6 +30,7 @@ export class CheckoutComponent implements OnInit {
   applyPoints: boolean = false;
 
   finalSubtotal: number = 0;
+  originalSubtotal: number = 0;
   finalTotal: number = 0;
   finalTax: number = 0;
 
@@ -88,6 +89,13 @@ export class CheckoutComponent implements OnInit {
     this.generateTimeOptions();
     this.checkDeliveryEligibility();
   }
+
+  get maxRedeemablePoints(): number {
+    const maxPoints = Math.min(this.checkoutInfo.user_info.points, this.originalSubtotal * 20);
+    return Math.ceil(maxPoints);
+  }
+  
+  
   
   checkDeliveryEligibility() {
     this.settingsService.checkDeliveryEligibility().subscribe({
@@ -320,11 +328,11 @@ export class CheckoutComponent implements OnInit {
 
   updateTotals() {
     const pointsValue = this.pointsToRedeem * this.pointValue;
-    const originalSubtotal = this.checkoutInfo.cart.reduce(
+    this.originalSubtotal = this.checkoutInfo.cart.reduce(
       (total: number, item: any) => total + (item.price * item.quantity),
       0
     );
-    this.finalSubtotal = originalSubtotal - pointsValue;
+    this.finalSubtotal = this.originalSubtotal - pointsValue;
     if (this.finalSubtotal < 0) this.finalSubtotal = 0;
     this.finalTax = this.finalSubtotal * 0.13;
     this.finalTotal = this.finalSubtotal + this.finalTax;

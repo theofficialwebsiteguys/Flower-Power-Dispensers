@@ -203,13 +203,13 @@
         <ion-range
           [(ngModel)]="pointsToRedeem"
           [min]="0"
-          [max]="checkoutInfo.user_info.points"
+          [max]="maxRedeemablePoints"
           [step]="1"
           (ionChange)="updateTotals()"
           aria-label="Adjust points to redeem for discount"
         >
           <ion-label slot="start">0</ion-label>
-          <ion-label slot="end">{{ checkoutInfo.user_info.points }}</ion-label>
+          <ion-label slot="end">{{ maxRedeemablePoints }}</ion-label>
         </ion-range>
       </ion-item>
       <p>
