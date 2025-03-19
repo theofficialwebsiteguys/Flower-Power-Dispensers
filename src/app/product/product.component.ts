@@ -70,9 +70,6 @@ export class ProductComponent implements OnInit {
     if (product.image) {
       return product.image;
     }
-    if (product.brand) {
-      return `assets/brand_images/${product.brand.toLowerCase().replace(/\s+/g, '-')}.jpg`;
-    }
-    return 'assets/default.jpg';
+    return 'assets/default.png';
   }
 }

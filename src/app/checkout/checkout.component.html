@@ -230,7 +230,7 @@
     <ul>
       <li *ngFor="let item of checkoutInfo.cart" class="order-item">
         <img
-          [src]="item.image"
+          [src]="item.image === '' ? 'assets/default.png' : item.image "
           [alt]="'Image of ' + item.title"
           class="item-image"
         />

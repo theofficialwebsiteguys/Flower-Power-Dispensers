@@ -16,7 +16,7 @@ export class ProductsPage implements OnInit {
   ngOnInit() {}
 
   ionViewDidEnter(): void {
-    this.scrollToTop(); // Scroll to top when the page is fully loaded
+    // this.scrollToTop(); // Scroll to top when the page is fully loaded
   }
 
   scrollToTop() {
