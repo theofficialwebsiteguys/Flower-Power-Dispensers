@@ -38,7 +38,7 @@ export type ProductFilterOptions = {
 };
 
 export const DEFAULT_PRODUCT_FILTERS: ProductFilters = {
-  sortMethod: { criterion: 'ALPHABETICAL', direction: 'ASC' },
+  sortMethod: { criterion: 'RECENT', direction: 'DESC' },
   brands: [],
   strains: [],
   weights: [],

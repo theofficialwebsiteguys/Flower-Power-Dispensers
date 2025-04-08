@@ -114,7 +114,7 @@ export class AeropayService {
     const transactionUUID = uuidv4();
     const payload = {
       amount: amount,
-      id: environment.aeropay_merchant_id,
+      merchantId: environment.aeropay_merchant_id,
       uuid: transactionUUID,
       bankAccountId: bankAccountId
     };
