@@ -122,6 +122,30 @@
         <ion-label>State</ion-label>
         <ion-text>{{ deliveryAddress.state }}</ion-text>
       </ion-item>
+      <div class="date-time-container">
+        <ion-item class="rounded-input">
+          <ion-datetime-button datetime="pickupDate"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="pickupDate"
+                presentation="date"
+                [(ngModel)]="selectedDeliveryDate"
+                (ionChange)="onDateSelected($event)"
+                [min]="minDate"
+              ></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+      
+        <ion-item class="rounded-input">
+          <ion-select [(ngModel)]="selectedDeliveryTime" placeholder="Select Time">
+            <ion-select-option *ngFor="let time of timeOptions" [value]="time.value">
+              {{ time.display }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
     </div>
     
     

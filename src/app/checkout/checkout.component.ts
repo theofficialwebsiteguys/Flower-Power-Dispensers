@@ -21,6 +21,9 @@ export class CheckoutComponent implements OnInit {
     zip: '',
     state: 'NY' // Default to New York and cannot be changed
   };
+
+  minDate: string = new Date().toISOString();
+
   
   isDatePickerOpen = false;
   selectedDate: string | null = null;
@@ -73,6 +76,19 @@ export class CheckoutComponent implements OnInit {
   aeropayUserId: any;
 
   loadingAerosync = false;
+  selectedDeliveryDate: string | null = null;
+  selectedDeliveryTime: string = '';
+
+  deliveryHoursByDay: { [key: number]: { start: number; end: number } } = {
+    0: { start: 11, end: 21 }, // Sunday
+    1: { start: 8, end: 22 },  // Monday
+    2: { start: 8, end: 22 },  // Tuesday
+    3: { start: 8, end: 22 },  // Wednesday
+    4: { start: 8, end: 22 },  // Thursday
+    5: { start: 8, end: 23 },  // Friday
+    6: { start: 10, end: 23 }, // Saturday
+  };
+  
 
   constructor(
     private cartService: CartService,
@@ -86,9 +102,45 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit() {
     this.calculateDefaultTotals();
-    this.generateTimeOptions();
     this.checkDeliveryEligibility();
+
+    const now = new Date();
+    const todayISO = now.toISOString().split('T')[0];
+    this.selectedDeliveryDate = todayISO;
+  
+    const todayDayIndex = now.getDay(); // 0-6
+    this.generateTimeOptionsForDay(todayDayIndex);
+  
+    this.selectNearestFutureTime(now, todayDayIndex);
   }
+
+  selectNearestFutureTime(current: Date, dayOfWeek: number) {
+    const currentMinutes = current.getHours() * 60 + current.getMinutes() + 30; // add 30-minute buffer
+    const hours = this.deliveryHoursByDay[dayOfWeek];
+  
+    for (let hour = hours.start; hour <= hours.end; hour++) {
+      for (let minute of [0, 30]) {
+        const timeMinutes = hour * 60 + minute;
+        if (timeMinutes >= currentMinutes) {
+          const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
+          const formattedMinute = minute === 0 ? '00' : '30';
+          this.selectedDeliveryTime = `${formattedHour}:${formattedMinute}`;
+          return;
+        }
+      }
+    }
+  
+    // If no valid slot today, go to next day
+    const nextDay = (dayOfWeek + 1) % 7;
+    const tomorrow = new Date(current.getTime() + 86400000); // +1 day
+    this.selectedDeliveryDate = tomorrow.toISOString().split('T')[0];
+    this.generateTimeOptionsForDay(nextDay);
+  
+    const nextDayHours = this.deliveryHoursByDay[nextDay];
+    const fallbackHour = nextDayHours.start;
+    this.selectedDeliveryTime = `${fallbackHour < 10 ? '0' + fallbackHour : fallbackHour}:00`;
+  }
+  
 
   get maxRedeemablePoints(): number {
     const maxPoints = Math.min(this.checkoutInfo.user_info.points, this.originalSubtotal * 20);
@@ -304,18 +356,32 @@ export class CheckoutComponent implements OnInit {
     this.selectedBankId = bankId;
   }
 
-  generateTimeOptions() {
-    for (let hour = 8; hour <= 23; hour++) {
-      const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-      const amPm = hour < 12 ? 'AM' : 'PM';
-      const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
-      this.timeOptions.push({
-        value: `${formattedHour}:00`,
-        display: `${displayHour}:00 ${amPm}`,
-      });
+  generateTimeOptionsForDay(dayOfWeek: number) {
+    this.timeOptions = [];
+  
+    const hours = this.deliveryHoursByDay[dayOfWeek];
+    const startHour = hours.start;
+    const endHour = hours.end;
+  
+    for (let hour = startHour; hour <= endHour; hour++) {
+      for (let minute of [0, 30]) {
+        // Don't exceed endHour if it's the last half-hour
+        if (hour === endHour && minute === 30) break;
+  
+        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+        const amPm = hour < 12 ? 'AM' : 'PM';
+        const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
+        const formattedMinute = minute === 0 ? '00' : '30';
+  
+        this.timeOptions.push({
+          value: `${formattedHour}:${formattedMinute}`,
+          display: `${displayHour}:${formattedMinute} ${amPm}`,
+        });
+      }
     }
   }
-
+  
+  
   calculateDefaultTotals() {
     this.finalSubtotal = this.checkoutInfo.cart.reduce(
       (total: number, item: any) => total + (item.price * item.quantity),
@@ -367,19 +433,29 @@ export class CheckoutComponent implements OnInit {
   }
 
   onDateSelected(event: any) {
-    const date = new Date(event.detail.value);
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'long',
-      day: 'numeric',
-    };
-    this.selectedDate = date.toLocaleDateString(undefined, options);
-    this.showTooltip = false;
+    const isoString = event.detail.value; // "YYYY-MM-DDTHH:mm:ss.sssZ"
+  
+    if (!isoString) return; // Exit early if event has no value
+  
+    this.selectedDeliveryDate = isoString.split('T')[0]; // "YYYY-MM-DD"
+  
+    if (!this.selectedDeliveryDate) return;
+  
+    const [year, month, day] = this.selectedDeliveryDate.split('-');
+    const date = new Date(this.selectedDeliveryDate);
+    const dayOfWeek = date.getDay(); // Sunday = 0 ... Saturday = 6
+  
+    this.generateTimeOptionsForDay(dayOfWeek);
+  
     this.accessibilityService.announce(
-      `Selected date is ${this.selectedDate}.`,
+      `Selected date is ${month}-${day}-${year}.`,
       'polite'
     );
   }
-
+  
+  
+  
+  
   async placeOrder() {
     this.isLoading = true;
     const loading = await this.loadingController.create({
@@ -403,7 +479,8 @@ export class CheckoutComponent implements OnInit {
               city: this.deliveryAddress.city.trim(),
               state: this.deliveryAddress.state.trim(),
               zip: this.deliveryAddress.zip.trim(),
-              delivery_date: new Date().toISOString().split('T')[0],
+              delivery_date: this.selectedDeliveryDate,
+              delivery_eta_start: this.selectedDeliveryTime
             }
           : null;
 
