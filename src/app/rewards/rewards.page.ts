@@ -37,4 +37,22 @@ export class RewardsPage implements OnInit {
     }
   }
 
+  onDeleteAccount() {
+    const userId = this.authService.getCurrentUser()?.id;
+  
+    if (userId) {
+      if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
+        this.authService.deleteAccount(userId).subscribe({
+          next: () => {
+            // Already handled in service (redirect, token removal)
+            alert('Account deleted successfully.');
+          },
+          error: (err) => {
+            alert('Something went wrong. Please try again.');
+          }
+        });
+      }
+    }
+  }
+
 }

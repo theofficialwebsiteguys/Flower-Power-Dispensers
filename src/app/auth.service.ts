@@ -361,6 +361,31 @@ export class AuthService {
     }
   }
   
-
+  deleteAccount(userId: number): Observable<any> {
+    const headers = this.getHeaders();
+    const url = `${this.apiUrl}/delete/${userId}`;
+  
+    return new Observable((observer) => {
+      CapacitorHttp.delete({
+        url,
+        headers,
+      })
+        .then((response) => {
+          // Clear local data
+          this.removeToken();
+          this.removeUser();
+          this.authStatus.next(false);
+          this.userSubject.next(null);
+          this.router.navigate(['/login']); // or homepage
+          observer.next(response.data);
+          observer.complete();
+        })
+        .catch((error) => {
+          console.error('Account deletion failed:', error);
+          observer.error(error);
+        });
+    });
+  }
+  
 
 }
