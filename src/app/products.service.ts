@@ -344,6 +344,7 @@ export class ProductsService {
       { category: 'CONCENTRATES', imageUrl: 'assets/icons/concentrates.png' },
       { category: 'BEVERAGE', imageUrl: 'assets/icons/beverages.png' },
       { category: 'TINCTURES', imageUrl: 'assets/icons/tinctures.png' },
+      { category: 'TOPICAL', imageUrl: 'assets/icons/topicals.png' },
       { category: 'ACCESSORIES', imageUrl: 'assets/icons/accessories.png' },
     ];
   }

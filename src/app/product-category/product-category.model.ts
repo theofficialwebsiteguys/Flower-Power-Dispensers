@@ -6,6 +6,7 @@ export type ProductCategory =
   | 'BEVERAGE'
   | 'TINCTURES'
   | 'EDIBLE'
+  | 'TOPICAL'
   | 'ACCESSORIES';
 
   export interface CategoryWithImage {
