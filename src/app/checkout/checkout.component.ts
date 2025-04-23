@@ -21,10 +21,10 @@ export class CheckoutComponent implements OnInit {
     zip: '',
     state: 'NY' // Default to New York and cannot be changed
   };
-
-  minDate: string = new Date().toISOString();
-
   
+  minDate: string = '';
+
+ 
   isDatePickerOpen = false;
   selectedDate: string | null = null;
   pointsToRedeem: number = 0;
@@ -88,7 +88,15 @@ export class CheckoutComponent implements OnInit {
     5: { start: 8, end: 23 },  // Friday
     6: { start: 10, end: 23 }, // Saturday
   };
-  
+
+  premiumDiscountRate: number = 0.10;
+  premiumDiscountApplied: boolean = false;
+  premiumDiscountAmount: number = 0;
+
+  employeeDiscountApplied = false;
+  employeeDiscountAmount = 0;
+  employeeDiscountRate = 0.15; // fallback default
+    
 
   constructor(
     private cartService: CartService,
@@ -105,13 +113,17 @@ export class CheckoutComponent implements OnInit {
     this.checkDeliveryEligibility();
 
     const now = new Date();
-    const todayISO = now.toISOString().split('T')[0];
-    this.selectedDeliveryDate = todayISO;
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    this.minDate = tomorrow.toISOString().split('T')[0];
   
-    const todayDayIndex = now.getDay(); // 0-6
-    this.generateTimeOptionsForDay(todayDayIndex);
+    // 👇 Set default selected delivery date to tomorrow
+    this.selectedDeliveryDate = this.minDate;
   
-    this.selectNearestFutureTime(now, todayDayIndex);
+    const tomorrowDayIndex = tomorrow.getDay(); // 0 (Sun) – 6 (Sat)
+    this.generateTimeOptionsForDay(tomorrowDayIndex);
+  
+    this.selectNearestFutureTime(tomorrow, tomorrowDayIndex);
   }
 
   selectNearestFutureTime(current: Date, dayOfWeek: number) {
@@ -398,19 +410,38 @@ export class CheckoutComponent implements OnInit {
       (total: number, item: any) => total + (item.price * item.quantity),
       0
     );
-    this.finalSubtotal = this.originalSubtotal - pointsValue;
-    if (this.finalSubtotal < 0) this.finalSubtotal = 0;
-    this.finalTax = this.finalSubtotal * 0.13;
-    this.finalTotal = this.finalSubtotal + this.finalTax;
-    // if(this.finalTotal >= 90 ){
-    //   this.enableDelivery = true;
-    // }
+  
+    // Reset premium discount
+    this.premiumDiscountApplied = false;
+    this.premiumDiscountAmount = 0;
+    this.employeeDiscountApplied = false;
+    this.employeeDiscountAmount = 0;
+  
+    let subtotalAfterPoints = this.originalSubtotal - pointsValue;
+    if (subtotalAfterPoints < 0) subtotalAfterPoints = 0;
+  
+    // ✅ Apply 10% premium discount if eligible
+    if (this.checkoutInfo.user_info.premium && this.originalSubtotal > 100) {
+      this.premiumDiscountAmount = subtotalAfterPoints * this.premiumDiscountRate;
+      this.premiumDiscountApplied = true;
+      subtotalAfterPoints -= this.premiumDiscountAmount;
+    }
 
+    if (this.checkoutInfo.user_info.role === 'employee' || this.checkoutInfo.user_info.role === 'admin') {
+      this.employeeDiscountAmount = subtotalAfterPoints * this.employeeDiscountRate;
+      this.employeeDiscountApplied = true;
+      subtotalAfterPoints -= this.employeeDiscountAmount;
+    }
+  
+    this.finalTax = subtotalAfterPoints * 0.13;
+    this.finalTotal = subtotalAfterPoints + this.finalTax;
+  
     this.accessibilityService.announce(
-      `Subtotal updated to ${this.finalSubtotal.toFixed(2)} dollars.`,
+      `Subtotal updated to ${subtotalAfterPoints.toFixed(2)} dollars.`,
       'polite'
     );
   }
+  
 
   goBack() {
     this.back.emit();

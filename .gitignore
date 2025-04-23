@@ -70,6 +70,7 @@ testem.log
 Thumbs.db
 
 /android
+/android-backup
 /ios
 
 src/environments/

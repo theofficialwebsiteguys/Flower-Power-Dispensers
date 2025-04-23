@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../auth.service';
-import { IonContent } from '@ionic/angular';
+import { AlertController, IonContent } from '@ionic/angular';
 
 @Component({
   selector: 'app-rewards',
@@ -14,7 +14,8 @@ export class RewardsPage implements OnInit {
 
   isLoggedIn: boolean = false;
 
-  constructor(private authService: AuthService) {}
+  showAdvanced = false;
+  constructor(private authService: AuthService,   private alertController: AlertController,) {}
 
   ngOnInit() {
     this.authService.isLoggedIn().subscribe((status) => {
@@ -24,6 +25,30 @@ export class RewardsPage implements OnInit {
       });
     });
   }
+
+  async presentDeleteModal() {
+    const alert = await this.alertController.create({
+      header: 'Confirm Deletion',
+      message: 'Are you sure you want to permanently delete your account? This action cannot be undone.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'cancel-button'
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          cssClass: 'delete-button',
+          handler: () => this.onDeleteAccount()
+        }
+      ],
+      cssClass: 'delete-account-alert'
+    });
+  
+    await alert.present();
+  }
+  
 
   ionViewDidEnter(): void {
     this.scrollToTop(); // Scroll to top when the page is fully loaded
@@ -41,17 +66,14 @@ export class RewardsPage implements OnInit {
     const userId = this.authService.getCurrentUser()?.id;
   
     if (userId) {
-      if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
         this.authService.deleteAccount(userId).subscribe({
           next: () => {
-            // Already handled in service (redirect, token removal)
             alert('Account deleted successfully.');
           },
           error: (err) => {
             alert('Something went wrong. Please try again.');
           }
         });
-      }
     }
   }
 

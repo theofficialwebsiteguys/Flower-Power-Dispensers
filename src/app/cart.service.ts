@@ -20,6 +20,8 @@ export interface CartItem {
   weight: string;
   category: string;
   id_item?: string;
+  price_after_points?: number;
+  price_after_premium?: number;
 }
 
 @Injectable({
@@ -176,7 +178,8 @@ export class CartService {
     let user_info: any;
     // let checkoutItems: any[] = [];
     let checkoutItems = [...cartItems];
-  
+    let employeeDiscount: any = null;
+
     // const fetchAndMatch = async (): Promise<any[]> => {
     //   while (unmatchedItems.length > 0) {
     //     const inventoryResponse = await this.fetchInventory(skip, take);
@@ -245,41 +248,235 @@ export class CartService {
       subtotal = checkoutItems.reduce((acc: number, item: any) => acc + (item.price || 0), 0);
     };
   
+    // const updateOrderItemPrices = async () => {
+    //   let remainingDiscount = points_redeem / 20;
+    //   const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
+    //   for (const item of sortedItems) {
+    //     console.log(item)
+    //     console.log(remainingDiscount)
+    //     if (remainingDiscount <= 0) break;
+    //     const discountAmount = Math.min(Number(item.price), remainingDiscount);
+    //     remainingDiscount -= discountAmount;
+    //     const priceOverride = Number(item.price) - discountAmount;
+    //     const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+    //     const headers = {
+    //       Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+    //       'Content-Type': 'application/json; charset=utf-8',
+    //       Accept: 'application/json; charset=utf-8',
+    //     };
+    //     const options = {
+    //       url: url,
+    //       method: 'PUT',
+    //       headers: headers,
+    //       data: {
+    //         price_override: priceOverride,
+    //         price_override_reason: 'Points redemption applied',
+    //       },
+    //     };
+    //     await CapacitorHttp.request(options);
+    //   }
+    // };
+
     const updateOrderItemPrices = async () => {
       let remainingDiscount = points_redeem / 20;
       const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
+    
       for (const item of sortedItems) {
-        console.log(item)
-        console.log(remainingDiscount)
         if (remainingDiscount <= 0) break;
+    
         const discountAmount = Math.min(Number(item.price), remainingDiscount);
         remainingDiscount -= discountAmount;
+    
         const priceOverride = Number(item.price) - discountAmount;
+    
+        // 🔥 Store in local item memory
+        item.price_after_points = priceOverride;
+    
         const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
         const headers = {
           Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
           'Content-Type': 'application/json; charset=utf-8',
           Accept: 'application/json; charset=utf-8',
         };
+    
         const options = {
-          url: url,
+          url,
           method: 'PUT',
-          headers: headers,
+          headers,
           data: {
             price_override: priceOverride,
             price_override_reason: 'Points redemption applied',
           },
         };
+    
         await CapacitorHttp.request(options);
       }
     };
+    
+
+    // const updatePremiumDiscounts = async () => {
+    //   // Only apply if user is premium AND subtotal is over $100
+    //   if (user_info?.premium && subtotal > 100) {
+    //     let premiumDiscount = subtotal * 0.10;
+    //     let remainingDiscount = premiumDiscount;
+    
+    //     const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
+    
+    //     for (const item of sortedItems) {
+    //       if (remainingDiscount <= 0) break;
+    
+    //       const discountAmount = Math.min(Number(item.price), remainingDiscount);
+    //       remainingDiscount -= discountAmount;
+    
+    //       const priceOverride = Number(item.price) - discountAmount;
+    //       const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+    //       const headers = {
+    //         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+    //         'Content-Type': 'application/json; charset=utf-8',
+    //         Accept: 'application/json; charset=utf-8',
+    //       };
+    
+    //       const options = {
+    //         url,
+    //         method: 'PUT',
+    //         headers,
+    //         data: {
+    //           price_override: priceOverride,
+    //           price_override_reason: 'Premium discount applied',
+    //         },
+    //       };
+    
+    //       await CapacitorHttp.request(options);
+    //     }
+    //   }
+    // };
+
+    const updatePremiumDiscounts = async () => {
+      if (user_info?.premium && subtotal > 100) {
+        let premiumDiscount = subtotal * 0.10;
+        let remainingDiscount = premiumDiscount;
+    
+        const sortedItems = [...checkoutItems].sort((a: any, b: any) => {
+          const priceA = a.price_after_points ?? Number(a.price);
+          const priceB = b.price_after_points ?? Number(b.price);
+          return priceB - priceA;
+        });
+        
+        for (const item of sortedItems) {
+          if (remainingDiscount <= 0) break;
+    
+          const basePrice = item.price_after_points ?? Number(item.price);
+          const discountAmount = Math.min(basePrice, remainingDiscount);
+          remainingDiscount -= discountAmount;
+    
+          const priceOverride = basePrice - discountAmount;
+          item.price_after_premium = priceOverride; // 🔥 Store it for next discount
+    
+          const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+          const headers = {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: 'application/json; charset=utf-8',
+          };
+    
+          const options = {
+            url,
+            method: 'PUT',
+            headers,
+            data: {
+              price_override: priceOverride,
+              price_override_reason: 'Premium discount applied',
+            },
+          };
+    
+          await CapacitorHttp.request(options);
+        }
+      }
+    };
+    
+
+    // const updateEmployeeDiscount = async () => {
+    //   if (!employeeDiscount || !employeeDiscount.cart_adjustments?.value) return;
+    
+    //   let discountRate = employeeDiscount.cart_adjustments.value / 100;
+    //   let totalDiscount = subtotal * discountRate;
+    //   let remainingDiscount = totalDiscount;
+    
+    //   const sortedItems = [...checkoutItems].sort((a: any, b: any) => b.price - a.price);
+    //   for (const item of sortedItems) {
+    //     if (remainingDiscount <= 0) break;
+    //     const discountAmount = Math.min(Number(item.price), remainingDiscount);
+    //     remainingDiscount -= discountAmount;
+    //     const priceOverride = Number(item.price) - discountAmount;
+        
+    //     const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+    //     const headers = {
+    //       Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+    //       'Content-Type': 'application/json; charset=utf-8',
+    //       Accept: 'application/json; charset=utf-8',
+    //     };
+    
+    //     const options = {
+    //       url,
+    //       method: 'PUT',
+    //       headers,
+    //       data: {
+    //         price_override: priceOverride,
+    //         price_override_reason: 'Staff discount applied',
+    //       },
+    //     };
+    
+    //     await CapacitorHttp.request(options);
+    //   }
+    // };
+
+    const updateEmployeeDiscount = async () => {
+      if (!employeeDiscount || !employeeDiscount.cart_adjustments?.value) return;
+    
+      const discountRate = employeeDiscount.cart_adjustments.value / 100;
+    
+      for (const item of checkoutItems) {
+        const basePrice = item.price_after_premium ?? item.price_after_points ?? Number(item.price);
+    
+        const staffDiscountAmount = basePrice * discountRate;
+        const finalPrice = basePrice - staffDiscountAmount;
+    
+        const url = `https://app.alleaves.com/api/order/${id_order}/item/${item.id_item}`;
+        const headers = {
+          Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+          'Content-Type': 'application/json; charset=utf-8',
+          Accept: 'application/json; charset=utf-8',
+        };
+    
+        const options = {
+          url,
+          method: 'PUT',
+          headers,
+          data: {
+            price_override: finalPrice,
+            price_override_reason: 'Points + Staff discount applied',
+          },
+        };
+    
+        await CapacitorHttp.request(options);
+      }
+    };
+    
+    
   
     return (async () => {
       try {
         await getUserInfo();
+
+        if (user_info?.role === 'employee' || user_info?.role === 'admin') {
+          employeeDiscount = await this.fetchActiveEmployeeDiscount();
+        }
+
         await createOrder();
         await addItemsToOrder();
         await updateOrderItemPrices();
+        await updatePremiumDiscounts();
+        await updateEmployeeDiscount();
         return { user_info, id_order, checkoutItems, subtotal };
       } catch (error) {
         console.error('Checkout process failed:', error);
@@ -685,4 +882,34 @@ export class CartService {
       });
   }  
 
+  async fetchActiveEmployeeDiscount(): Promise<any | null> {
+    const headers = {
+      Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('authTokensAlleaves') || '{}')}`,
+      'Content-Type': 'application/json; charset=utf-8',
+      Accept: 'application/json; charset=utf-8',
+    };
+  
+    const options = {
+      url: 'https://app.alleaves.com/api/discount',
+      method: 'GET',
+      headers,
+    };
+  
+    try {
+      const response = await CapacitorHttp.request(options);
+      const discounts = response.data || [];
+  
+      const staffDiscount = discounts.find((d: any) =>
+        d.enabled &&
+        d.cart_adjustments?.label?.toLowerCase() === 'staff' &&
+        d.cart_adjustments?.type === 'percentage'
+      );
+  
+      return staffDiscount || null;
+    } catch (error) {
+      console.error('Failed to fetch employee discounts:', error);
+      return null;
+    }
+  }
+  
 }

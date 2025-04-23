@@ -209,6 +209,9 @@
 
   <div class="section order-summary">
     <h2>Order Summary</h2>
+    <div *ngIf="checkoutInfo.user_info.premium" class="premium-banner">
+      🎉 You're a Premium Member! Orders over $100 get an extra 10% off.
+    </div>    
     <div class="summary" aria-live="polite">
       <p>
         Subtotal: <span>{{ finalSubtotal | currency }}</span>
@@ -240,6 +243,14 @@
         Discount Applied:
         <span>{{ pointsToRedeem * pointValue | currency }}</span>
       </p>
+      <p *ngIf="premiumDiscountApplied">
+        Premium Member Discount (10%): 
+        <span>-{{ premiumDiscountAmount | currency }}</span>
+      </p>
+      <p *ngIf="employeeDiscountApplied">
+        Staff Discount:
+        <span>-{{ employeeDiscountAmount | currency }}</span>
+      </p>      
       <p>
         Tax: <span>{{ finalTax | currency }}</span>
       </p>

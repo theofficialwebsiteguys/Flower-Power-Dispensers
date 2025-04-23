@@ -19,10 +19,18 @@
     <app-review aria-label="Leave a review"></app-review>
 
 
-    <div class="setting-item">
-      <ion-button class="action-button" (click)="onDeleteAccount()">
-        Delete My Account
-      </ion-button>   
+    <div class="setting-item advanced">
+      <ion-item lines="none" class="advanced-toggle"  (click)="showAdvanced = !showAdvanced">
+        <ion-label>Advanced</ion-label>
+        <ion-icon name="chevron-down-outline" slot="end"></ion-icon>
+      </ion-item>
+      
+      <div *ngIf="showAdvanced" class="advanced-section">
+        <ion-button class="action-button"(click)="presentDeleteModal()">
+          Delete My Account
+        </ion-button>   
+      </div>
+      
     </div>
   </div>
 
