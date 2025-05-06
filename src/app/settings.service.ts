@@ -198,6 +198,40 @@ export class SettingsService {
     return from(CapacitorHttp.request(options).then(response => response.data));
   }
 
+  async getDeliveryZone(): Promise<any> {
+    const options = {
+      url: `${environment.apiUrl}/businesses/zone`,
+      method: 'GET',
+      headers: this.getHeaders()
+    };
+  
+    try {
+      const response = await CapacitorHttp.request(options);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching delivery zone:', error);
+      throw error;
+    }
+  }
+  
+  async checkAddressInZone(businessId: number, address: string): Promise<{ inZone: boolean, lat: number, lng: number }> {
+    const options = {
+      url: `${environment.apiUrl}/businesses/zone/check`,
+      method: 'POST',
+      headers: this.getHeaders(),
+      data: { address }
+    };
+  
+    try {
+      const response = await CapacitorHttp.request(options);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking address in zone:', error);
+      throw error;
+    }
+  }
+  
+  
 
   
 }

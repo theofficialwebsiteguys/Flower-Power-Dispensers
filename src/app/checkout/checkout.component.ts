@@ -97,7 +97,12 @@ export class CheckoutComponent implements OnInit {
   employeeDiscountAmount = 0;
   employeeDiscountRate = 0.15; // fallback default
     
+  deliverySchedule: { day: string; startTime: string; endTime: string }[] = [];
+  validDeliveryDates: string[] = [];
 
+  deliveryAddressValid: boolean = false;
+
+  
   constructor(
     private cartService: CartService,
     private loadingController: LoadingController,
@@ -108,23 +113,48 @@ export class CheckoutComponent implements OnInit {
     private settingsService: SettingsService
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.calculateDefaultTotals();
     this.checkDeliveryEligibility();
-
+  
+    try {
+      const res: any = await this.settingsService.getDeliveryZone();
+  
+      if (res.schedule) {
+        this.deliverySchedule = res.schedule;
+  
+        const availableDates = this.getAvailableDeliveryDates(res.schedule);
+        this.validDeliveryDates = availableDates;
+  
+        if (availableDates.length === 0) {
+          this.presentToast('No available delivery days found.', 'danger');
+          return;
+        }
+  
+        // Set first available date
+        this.selectedDeliveryDate = availableDates[0];
+  
+        const selectedDate = new Date(this.selectedDeliveryDate);
+        const dayOfWeek = selectedDate.getDay(); // 0 = Sunday
+        this.generateTimeOptionsFromSchedule(dayOfWeek);
+        this.selectNearestFutureTime(selectedDate, dayOfWeek);
+      }
+    } catch (err) {
+      console.error('Failed to load delivery zone', err);
+      this.presentToast('Unable to load delivery schedule.', 'danger');
+    }
+  
+    // Set min selectable date
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(now.getDate() + 1);
     this.minDate = tomorrow.toISOString().split('T')[0];
-  
-    // 👇 Set default selected delivery date to tomorrow
-    this.selectedDeliveryDate = this.minDate;
-  
-    const tomorrowDayIndex = tomorrow.getDay(); // 0 (Sun) – 6 (Sat)
-    this.generateTimeOptionsForDay(tomorrowDayIndex);
-  
-    this.selectNearestFutureTime(tomorrow, tomorrowDayIndex);
   }
+  
+
+  isDateValid = (dateIsoString: string) => {
+    return this.validDeliveryDates.includes(dateIsoString.split('T')[0]);
+  };  
 
   selectNearestFutureTime(current: Date, dayOfWeek: number) {
     const currentMinutes = current.getHours() * 60 + current.getMinutes() + 30; // add 30-minute buffer
@@ -591,4 +621,84 @@ export class CheckoutComponent implements OnInit {
   }
   
 
+  async onAddressInputChange() {
+    const { street, city, zip } = this.deliveryAddress;
+
+    this.deliveryAddressValid = false;
+
+    // Basic check to avoid premature calls
+    if (street.trim() && city.trim() && zip.trim().length >= 5) {
+      const fullAddress = `${street.trim()}, ${city.trim()}, NY ${zip.trim()}`;
+
+      try {
+        const result = await this.settingsService.checkAddressInZone(
+          this.checkoutInfo.business_id,
+          fullAddress
+        );
+
+        if (!result.inZone) {
+          this.presentToast('This address is outside the delivery zone.', 'danger');
+          this.deliveryAddressValid = false;
+        } else {
+          this.deliveryAddressValid = true;
+          console.log('Address is within delivery zone.');
+        }
+
+      } catch (err) {
+        console.error('Address check error:', err);
+        this.presentToast('Failed to verify delivery address.', 'danger');
+      }
+    }
+  }
+  getAvailableDeliveryDates(schedule: any[]): string[] {
+    const validDates: string[] = [];
+    const today = new Date();
+  
+    for (let i = 0; i < 30; i++) {
+      const date = new Date();
+      date.setDate(today.getDate() + i);
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+  
+      const match = schedule.find(d => d.day === dayName);
+      if (match) {
+        validDates.push(date.toISOString().split('T')[0]);
+      }
+    }
+    return validDates;
+  }
+  
+  generateTimeOptionsFromSchedule(dayOfWeek: number) {
+    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
+    const scheduleForDay = this.deliverySchedule.find(d => d.day === dayName);
+  
+    if (!scheduleForDay) {
+      this.timeOptions = [];
+      return;
+    }
+  
+    const [startHour, startMinute] = scheduleForDay.startTime.split(':').map(Number);
+    const [endHour, endMinute] = scheduleForDay.endTime.split(':').map(Number);
+  
+    const options = [];
+    for (let hour = startHour; hour <= endHour; hour++) {
+      for (let min of [0, 30]) {
+        if (hour === endHour && min >= endMinute) continue;
+  
+        const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+        const amPm = hour < 12 ? 'AM' : 'PM';
+        const formattedHour = hour < 10 ? `0${hour}` : `${hour}`;
+        const formattedMinute = min === 0 ? '00' : '30';
+  
+        options.push({
+          value: `${formattedHour}:${formattedMinute}`,
+          display: `${displayHour}:${formattedMinute} ${amPm}`
+        });
+      }
+    }
+  
+    this.timeOptions = options;
+  }
+  
+
+  
 }

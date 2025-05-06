@@ -80,6 +80,7 @@
       <ion-item class="rounded-input">
         <ion-input
           [(ngModel)]="deliveryAddress.street"
+          (ngModelChange)="onAddressInputChange()"
           autocomplete="address-line1"
           name="street"
           placeholder="Street Address"
@@ -90,6 +91,7 @@
       <ion-item class="rounded-input">
         <ion-input
           [(ngModel)]="deliveryAddress.apt"
+          (ngModelChange)="onAddressInputChange()"
           autocomplete="address-line2"
           name="apt"
           placeholder="Apartment / Suite (Optional)"
@@ -101,6 +103,7 @@
         <ion-item class="rounded-input half-width">
           <ion-input
             [(ngModel)]="deliveryAddress.city"
+            (ngModelChange)="onAddressInputChange()"
             autocomplete="address-level2"
             name="city"
             placeholder="City"
@@ -110,6 +113,7 @@
         <ion-item class="rounded-input half-width">
           <ion-input
             [(ngModel)]="deliveryAddress.zip"
+            (ngModelChange)="onAddressInputChange()"
             autocomplete="postal-code"
             name="zip"
             placeholder="ZIP Code"
@@ -131,6 +135,7 @@
                 id="pickupDate"
                 presentation="date"
                 [(ngModel)]="selectedDeliveryDate"
+                [isDateEnabled]="isDateValid"
                 (ionChange)="onDateSelected($event)"
                 [min]="minDate"
               ></ion-datetime>
@@ -282,7 +287,9 @@
   expand="block"
   class="sticky-footer"
   (click)="placeOrder()"
-  [disabled]="selectedPaymentMethod === 'aeropay' && !selectedBankId"
+  [disabled]="
+  (selectedPaymentMethod === 'aeropay' && !selectedBankId) ||
+  (selectedOrderType === 'delivery' && !deliveryAddressValid)"
   aria-label="Place your order"
 >
   Submit Order
