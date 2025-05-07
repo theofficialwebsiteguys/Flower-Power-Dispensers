@@ -163,4 +163,28 @@ export class FcmService {
       console.error('Error removing token from backend:', JSON.stringify(error));
     }
   }
+
+  async sendPushNotification(userId: number, title: string, body: string) {
+    try {
+      const sessionData = localStorage.getItem('sessionData');
+      const authToken = sessionData ? JSON.parse(sessionData).token : null;
+
+      const response = await CapacitorHttp.post({
+        url: `${environment.apiUrl}/notifications/send-push`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authToken || '',
+        },
+        data: {
+          userId,
+          title,
+          body,
+        },
+      });
+
+      console.log('Push notification sent:', response.data);
+    } catch (error) {
+      console.error('Error sending push notification:', JSON.stringify(error));
+    }
+  }
 }

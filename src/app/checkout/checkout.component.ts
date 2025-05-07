@@ -6,6 +6,8 @@ import { AuthService } from '../auth.service';
 import { AeropayService } from '../aeropay.service';
 import { openWidget } from 'aerosync-web-sdk';
 import { SettingsService } from '../settings.service';
+import { FcmService } from '../fcm.service';
+
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
@@ -110,7 +112,8 @@ export class CheckoutComponent implements OnInit {
     private toastController: ToastController,
     private authService: AuthService,
     private aeropayService: AeropayService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private fcmService: FcmService
   ) {}
 
   async ngOnInit() {
@@ -583,6 +586,18 @@ export class CheckoutComponent implements OnInit {
       const userOrders = await this.authService.getUserOrders(); // ✅ Ensure this is awaited
       
       this.accessibilityService.announce('Your order has been placed successfully.', 'polite');
+
+      const orderTypeMessage =
+      this.selectedOrderType === 'delivery'
+        ? 'Your delivery order has been placed!'
+        : 'Your pickup order has been placed!';
+
+      await this.fcmService.sendPushNotification(
+        this.checkoutInfo.user_info.id,
+        'Order Confirmed',
+        orderTypeMessage
+      );
+
     } catch (error:any) {
       console.error('Error placing order:', error);
       await this.presentToast('Error placing order: ' + JSON.stringify(error.message));
