@@ -55,7 +55,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <div class="filters-container">
+    <div class="filters-container scrollable-notifications">
       <div *ngIf="notifications.length === 0" class="empty-notifications">
         No new notifications.
       </div>
@@ -65,7 +65,10 @@
            [class.unread]="!notification.read"
            (click)="markAsRead(notification)">
         <ion-icon name="alert-circle" class="notification-icon" aria-hidden="true"></ion-icon>
-        <span>{{ notification.message }}</span>
+        <div class="notification-text">
+          <span>{{ notification.message }}</span>
+          <small class="notification-date">{{ notification.createdAt | date:'MMM d, y, h:mm a' }}</small>
+        </div>
         <ion-button fill="clear" slot="end" (click)="clearNotification(notification)">Clear</ion-button>
       </div>
 

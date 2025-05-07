@@ -183,3 +183,18 @@ ion-button.clear {
   color: #aaa;
   font-size: 16px;
 }
+
+.scrollable-notifications {
+  overflow-y: auto;
+}
+
+.notification-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-date {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}

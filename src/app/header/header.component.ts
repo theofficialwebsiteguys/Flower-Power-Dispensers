@@ -47,7 +47,9 @@ export class HeaderComponent {
       // Updated getUserNotifications call using async/await
       try {
         const notifications = await this.settingsService.getUserNotifications();
-        this.notifications = notifications;
+        this.notifications = notifications.sort(
+          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );        
         this.unreadCount = notifications.filter((n: any) => n.status === 'unread').length;
       } catch (error) {
         console.error('Error fetching notifications:', error);
